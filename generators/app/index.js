@@ -1,3 +1,4 @@
+
 const changeCase = require('change-case')
 const titleCase = require('title-case')
 const Generator = require('yeoman-generator')
@@ -28,8 +29,6 @@ module.exports = class extends Generator {
             projectNameTitleCase : titleCase.titleCase(this.props.projectName),
             projectNameParamCase: changeCase.paramCase(this.props.projectName)
         }
-
-        this.log("peppepeppe")
         
         let siht = this;
         function ctpl(tplname) {
