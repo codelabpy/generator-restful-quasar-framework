@@ -30,11 +30,11 @@ module.exports = class extends Generator {
             projectNameParamCase: changeCase.paramCase(this.props.projectName)
         }
         
-        let siht = this;
+        let thisobj = this;
         function ctpl(tplname) {
-            siht.fs.copyTpl(
-                siht.templatePath(tplname),
-                siht.destinationPath(tplname),
+            thisobj.fs.copyTpl(
+                thisobj.templatePath(tplname),
+                thisobj.destinationPath(tplname),
                 properties
             );
         }
