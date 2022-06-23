@@ -1,0 +1,152 @@
+<%_
+  let collection = serviceName;
+  let firstItem = isPaginated ? thejson[itemsName][0] : thejson[0];
+  let edit_fields = thekeys.filter(e => !(meta && meta.no_edit && meta.no_edit.includes(e)));
+  let title = meta && meta.main_title ? meta.main_title : serviceNameTitleCase;
+  let edit_columns = meta && meta.edit_columns ? meta.edit_columns : 2;
+_%>
+<template lang="pug">
+
+{% comment %} SECTION TO COMPLETE AND ADAPT {% endcomment %}
+
+{% comment %} q-page(style="margin-left:auto; margin-right:auto; padding: 1rem")
+  DataTable(v-if="status=='list'" title="<%= serviceNameTitleCase %>" @add="add" @edit="edit" @remove="remove" :rows="<%= collection %>List" :columns="<%= collection%>Columns" row-key="id")
+  div(v-if="status=='add' || status=='edit'")
+    q-form.q-mx-lg.q-mt-lg
+      div.row
+        div.col-xs-12.col-sm-6.col-md-6.q-pa-md
+          InputText(v-model="userInstance.id" label="Id")
+        div.col-xs-12.col-sm-6.col-md-6.q-pa-md
+          InputText(v-model="userInstance.user" label="User")
+      div.row
+        div.col-xs-12.col-sm-6.col-md-6.q-pa-md
+          q-input(v-model="userInstance.password" outlined dense label="Password" bg-color="white")
+        div.col-xs-12.col-sm-6.col-md-6.q-pa-md
+          q-input(v-model="userInstance.status" outlined dense label="Status" bg-color="white")
+
+      div.text-center.q-gutter-md.q-mt-lg
+        q-btn(v-if="status=='add'" label="Guardar" color="primary" @click.prevent="save(userInstance)")
+        q-btn(v-if="status=='edit'" label="Guardar" color="primary" @click.prevent="update(userInstance)")
+        q-btn(label="Volver" color="primary" flat @click.prevent="status='list'")        
+
+    .section.detail(v-else @keyup.esc='status = "list"')
+      h2.subtitle Detalles de <%= title %>
+      form.form
+      <%_ edit_fields.forEach(function(e, index) { -%>
+        <%_ if(index == 0) { -%>
+        .columns
+        <%_ } -%>
+        <%_ if(index > 0 && index % edit_columns == 0) { -%>
+        .columns
+        <%_ } -%>
+        <%_ if( !(meta && meta.no_edit && meta.no_edit.includes(e)) ) { -%>
+          <%_ var fieldTitle = meta && meta.titles && meta.titles[e] ? meta.titles[e] : changeCase.titleCase(e) -%>
+          <%_
+          function lastParamsPug(field, index) {
+            if(meta && meta.max_length) {
+              if(index == 0 && meta.max_length[field]) {
+              _%>, '<%=e%>Input', <%=meta.max_length[field]%><%_
+              } else if (index == 0) {
+              _%>, '<%=e%>Input'<%_
+              } else if (meta.max_length && meta.max_length[field]) {
+              _%>, null, <%=meta.max_length[field]%><%_
+              }
+            } else if (index == 0) {
+            _%>, '<%=e%>Input'<%_
+            }
+          }
+          function lastParams(field, index) {
+            if (index == 0) {
+            -%> ref='<%=field%>Input'<%_
+            }
+            if (meta && meta.max_length && meta.max_length[field]) {
+            -%> maxLength='<%=meta.max_length[field]%>'<%_
+            }
+          }
+          -%>
+          <%_ if(typeof firstItem[e] === 'boolean') { -%>
+            CheckField(label='<%= fieldTitle %>' v-model='<%= collection %>Instance.<%=e%>'<%_lastParams(e, index)-%>)
+          <%_ } else if(typeof firstItem[e] === 'number') { -%>
+            <%_if(meta && meta.currency_fields && meta.currency_fields.includes(e)) {-%>
+            CurrencyField('<%= fieldTitle %>', '<%= collection %>Instance.<%=e%>'<%_lastParamsPug(e, index)-%>)
+            <%_ } else { -%>
+            NumberField(label='<%= fieldTitle %>' v-model='<%= collection %>Instance.<%=e%>'<%_lastParams(e, index)-%>)
+            <%_ } -%>
+          <%_ } else { -%>
+            <%_if(meta && meta.date_fields && meta.date_fields.includes(e)) {-%>
+            DateField(label='<%= fieldTitle %>' v-model='<%= collection %>Instance.<%=e%>'<%_lastParams(e, index)-%>)
+            <%_} else if(meta && meta.image_fields && meta.image_fields.includes(e)) {-%>
+            ImageUploadField(label='<%= fieldTitle %>' v-model='<%= collection %>Instance.<%=e%>'<%_lastParams(e, index)-%>)
+            <%_ } else { -%>
+            TextField(label='<%= fieldTitle %>' v-model='<%= collection %>Instance.<%=e%>'<%_lastParams(e, index)-%>)
+            <%_ } -%>
+          <%_ } -%>
+        <%_ } -%>
+      <%_ }) -%> {% endcomment %}
+
+</template>
+
+<script>
+
+import CrudBase from 'components/CrudBase.vue'
+import DataTable from 'components/DataTable.vue'
+import InputText from 'components/InputText.vue'
+  
+{% comment %} TODO: COLUMNS CONFIGURATION FOR DATATABLE {% endcomment %}
+
+export default {
+  extends: CrudBase,
+  data () {
+    return {
+      <%= collection %>List: [],
+      <%= collection %>Instance: {},
+      status: 'list',
+      <%= collection %>Columns
+    }
+  },
+  components: {
+    DataTable, InputText,
+  },
+  created: function() {
+    this.searchAction()
+  },
+  methods: {
+    searchAction: async function () {
+      try {
+        const results = (await this.$api.get('/<%= serviceName %>')).data
+        this.<%= collection %>List = results.items
+      } catch (error) {
+        console.log(error)
+        this.<%= collection %>List = []
+      }
+    },
+    add: function () {
+      this.status = 'add'
+      this.<%= collection%>Instance = {}
+    },
+    edit: function (instance) {
+      this.status = 'edit'
+      this.<%= collection %>Instance = instance
+    },
+    update: function(instance) {
+      this._put(`/<%= collection%>/${instance.id}`, instance)
+    },
+    save: function (instance) {
+      this._post('/<%= collection %>', instance, res => this.<%= collection %>List.push(res.data))
+    },
+    remove: function (instance) {
+      this.$q.dialog({
+        title: 'Eliminar',
+        message: 'Desea confirmar la eliminación?',
+        cancel: true,
+        persistent: true
+      }).onOk(async () => {
+        this._delete(`/<%= collection %>/${instance.id}`, () => this.searchAction())
+        if (!this.error) {
+          this.$q.notify({ message: 'Eliminación con exito', icon: 'check', color: 'positive' })
+        }
+      })
+    }
+  }
+}
+</script>
