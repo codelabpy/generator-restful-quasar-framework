@@ -1,17 +1,17 @@
 <template lang="pug">
-div.fullscreen.flex.flex-center
-  div.q-pa-md.login-container
-    q-form
+.fullscreen.flex.flex-center
+  .q-pa-md.login-container
+    q-form(@submit="login")
       q-card.q-pa-lg
         h4.text-center.text-h4.no-margin.q-pb-sm <%=projectNameTitleCase%>
         h6.text-center.text-h6.no-margin.q-pb-lg Iniciar sesión
-        div.q-gutter-md
+        .q-gutter-md
           q-input.text-body1(v-model="username" type="text" outlined label="Username *")
           q-input.text-body1(v-model="password" type="password" outlined label="Password *")
 
         p.text-center.text-negative.text-body1.q-pt-md {{errorMessage}}
-        div.text-center.q-pt-md
-          q-btn(label="Login" color="primary" @click.prevent="login")
+        .text-center.q-pt-md
+          q-btn(type="submit" label="Login" color="primary")
 </template>
 
 <script>
