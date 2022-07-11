@@ -1,0 +1,28 @@
+{
+  "configurations": {
+    "app": {
+      "adapter": "vscode-node",
+      "configuration": {
+        "request": "launch",
+        "protocol": "auto",
+        "stopOnEntry": false,
+        "console": "integratedTerminal",
+        "program": "~/APPS/DESARROLLO/NODE/node-v14.19.3-linux-x64/bin/yo",
+        "args": "restful-quasar-framework",
+        "cwd": "~/PROJECTS/CODELAB/GENERATED/restful-quasar-framework"
+      }
+    },
+    "crud": {
+      "adapter": "vscode-node",
+      "configuration": {
+        "request": "launch",
+        "protocol": "auto",
+        "stopOnEntry": false,
+        "console": "integratedTerminal",
+        "program": "~/APPS/DESARROLLO/NODE/node-v14.19.3-linux-x64/bin/yo",
+        "args": "restful-quasar-framework:crud",
+        "cwd": "~/PROJECTS/CODELAB/GENERATED/restful-quasar-framework"
+      }
+    }
+  }
+}

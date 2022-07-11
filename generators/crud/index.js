@@ -1,5 +1,5 @@
 'use strict'
-// const utils = require('../utils')
+const utils = require('../utils')
 const Generator = require('yeoman-generator')
 const path = require('path')
 const fs = require('fs')
@@ -45,7 +45,7 @@ module.exports = class extends Generator {
         type: 'input',
         name: 'authHeader',
         message: 'Ingrese la cabecera de autorización del servicio',
-        default: 'Bearer [access_token]'
+        default: `Bearer ${process.env.JWT ? process.env.JWT : '[acces_token]'}`
       },
       {
         type: 'input',
@@ -121,49 +121,46 @@ module.exports = class extends Generator {
 
     // this.fs.copy(`${this.templatePath()}/src`, `${this.destinationPath()}/src`)
 
-    // this.fs.copyTpl(
-    //   this.templatePath('View.vue.ejs'),
-    //   this.destinationPath(
-    //     'src/views/' + changeCase.pascalCase(this.props.serviceName) + '.vue'
-    //   ),
-    //   templateData
-    // )
+    this.fs.copyTpl(
+      this.templatePath('Prospectos.vue.ejs'),
+      this.destinationPath(
+        'src/views/' + changeCase.pascalCase(this.props.serviceName) + '.vue'
+      ),
+      templateData
+    )
 
-    // const dis = this
+    const dis = this
 
-    // function modifyDestFile (filename, withThis) {
-    //   if (dis.fs.exists(dis.destinationPath(filename))) {
-    //     const fileString = dis.fs.read(dis.destinationPath(filename))
-    //     const newFileString = withThis(fileString)
-    //     if (newFileString) {
-    //       dis.fs.write(dis.destinationPath(filename), newFileString)
-    //     }
-    //   }
-    // }
+    function modifyDestFile (filename, withThis) {
+      if (dis.fs.exists(dis.destinationPath(filename))) {
+        const fileString = dis.fs.read(dis.destinationPath(filename))
+        const newFileString = withThis(fileString)
+        if (newFileString) {
+          dis.fs.write(dis.destinationPath(filename), newFileString)
+        }
+      }
+    }
 
-    // modifyDestFile('src/router.js', (routerJs) => {
-    //   // check router.js content to avoid duplicate entries
-    //   if (utils.wordInText(templateData.serviceNamePascalCase, routerJs)) {
-    //     return
-    //   }
+    modifyDestFile('src/layouts/MainLayout.vue', (mainLayoutJs) => {
+      // check MainLayout.vue content to avoid duplicate entries
+      if (utils.wordInText(templateData.serviceNamePascalCase, mainLayoutJs)) {
+        return
+      }
 
-    //   const imports = this.fs.read(this.templatePath('imports_router.ejs'))
-    //   const jsonRoute = this.fs.read(this.templatePath('json_route_router.ejs'))
+      const menuLinksIndex = mainLayoutJs.indexOf('menuLinks = [')
 
-    //   const routerindex = routerJs.indexOf('routes: [')
+      if (menuLinksIndex === -1) {
+        throw new Error('No definition found in MenuLinks')
+      }
 
-    //   if (routerindex === -1) {
-    //     throw new Error('No router definition found in router.js')
-    //   }
+      const routerJsBefore = mainLayoutJs.substring(0, menuLinksIndex + 9)
+      const routerJsAfter = mainLayoutJs.substring(menuLinksIndex + 10)
 
-    //   const routerJsBefore = routerJs.substring(0, routerindex + 9)
-    //   const routerJsAfter = routerJs.substring(routerindex + 10)
-
-    //   return ejs.render(
-    //     imports + routerJsBefore + jsonRoute + routerJsAfter,
-    //     templateData
-    //   )
-    // })
+      return ejs.render(
+        imports + routerJsBefore + jsonRoute + routerJsAfter,
+        templateData
+      )
+    })
 
   }
 
