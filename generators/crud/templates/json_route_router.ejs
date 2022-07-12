@@ -1,9 +1,2 @@
-
-  {
-    path: '/<%=serviceName%>',
-    name: ''<%=serviceName%>',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/<%=serviceNamePascalCase%>Page.vue') },
-    ]
-  },
+,
+      { path: '/<%=serviceName%>', component: () => import('pages/<%=serviceNamePascalCase%>Page.vue') }

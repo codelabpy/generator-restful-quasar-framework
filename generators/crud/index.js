@@ -4,20 +4,28 @@ const Generator = require('yeoman-generator')
 const path = require('path')
 const fs = require('fs')
 const rp = require('request-promise')
-// const ejs = require('ejs')
+const ejs = require('ejs')
 
 const changeCase = require('change-case')
 const changeTitleCase = require('title-case')
 
 module.exports = class extends Generator {
-  prompting () {
+
+  async prompting () {
     const prompts = [
       {
         type: 'input',
-        name: 'jsonUrl',
+        name: 'baseUrl',
         message:
-          'Ingrese la url del servicio RESTful a construir las vistas crud',
-        default: 'http://localhost:5000/user'
+          'Ingrese la url BASE del servicio RESTful a construir las vistas crud',
+        default: 'http://localhost:5000'
+      },
+      {
+        type: 'input',
+        name: 'path',
+        message:
+          'Ingrese el path del servicio RESTful a construir las vistas crud',
+        default: '/user'
       },
       {
         type: 'confirm',
@@ -45,14 +53,25 @@ module.exports = class extends Generator {
         type: 'input',
         name: 'authHeader',
         message: 'Ingrese la cabecera de autorización del servicio',
-        default: `Bearer ${process.env.JWT ? process.env.JWT : '[acces_token]'}`
+        default: async (answers) => {
+          let response = await rp({
+            method: "POST",
+            uri: `${answers.baseUrl}/login`,
+            body: {
+              username: "test",
+              password: "test"
+            },
+            json: true
+          });
+          return `Bearer ${response.access_token}`;
+        }
       },
       {
         type: 'input',
         name: 'serviceName',
         message:
           'Ingrese el nombre del servicio (basado en el mismo se generaran los nombres de las vistas)',
-        default: 'user'
+        default: async (answers) => answers.path.slice(1)
       },
       {
         type: 'input',
@@ -64,6 +83,7 @@ module.exports = class extends Generator {
 
     return this.prompt(prompts).then(props => {
       // To access props later use this.props.someAnswer;
+      props.jsonUrl = `${props.baseUrl}${props.path}`
       this.props = props
     })
   }
@@ -124,7 +144,7 @@ module.exports = class extends Generator {
     this.fs.copyTpl(
       this.templatePath('Prospectos.vue.ejs'),
       this.destinationPath(
-        'src/views/' + changeCase.pascalCase(this.props.serviceName) + '.vue'
+        'src/pages/' + changeCase.pascalCase(this.props.serviceName) + '.vue'
       ),
       templateData
     )
@@ -153,11 +173,35 @@ module.exports = class extends Generator {
         throw new Error('No definition found in MenuLinks')
       }
 
-      const routerJsBefore = mainLayoutJs.substring(0, menuLinksIndex + 9)
-      const routerJsAfter = mainLayoutJs.substring(menuLinksIndex + 10)
+      let before = mainLayoutJs.substring(0, menuLinksIndex + 13)
+      let after = mainLayoutJs.substring(menuLinksIndex + 14)
+      let jsonMenuLink = this.fs.read(this.templatePath("json_menu_link.ejs"));
 
       return ejs.render(
-        imports + routerJsBefore + jsonRoute + routerJsAfter,
+        before + jsonMenuLink + after,
+        templateData
+      )
+    })
+
+    modifyDestFile('src/router/routes.js', (routesJs) => {
+      // check routes.js content to avoid duplicate entries
+      if (utils.wordInText(templateData.serviceNamePascalCase, routesJs)) {
+        return
+      }
+
+      let indexPageIndex = routesJs.indexOf("IndexPage.vue') }")
+      let hasMoreRoutes = routesJs.indexOf("IndexPage.vue') },") !== -1
+
+      if (indexPageIndex === -1) {
+        throw new Error('No definition found in routes.js')
+      }
+
+      let before = routesJs.substring(0, indexPageIndex + 17)
+      let after = routesJs.substring(indexPageIndex + 18)
+      let jsonRoute = this.fs.read(this.templatePath("json_route_router.ejs"));
+
+      return ejs.render(
+        before + `${jsonRoute}${hasMoreRoutes ? ',' : ''}` + after,
         templateData
       )
     })
