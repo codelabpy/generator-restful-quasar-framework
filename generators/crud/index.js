@@ -134,7 +134,13 @@ module.exports = class extends Generator {
       thejson,
       meta,
       changeCase,
-      thekeys
+      thekeys,
+      editFields: thekeys.filter(e => {
+        return !(meta && meta.no_edit && meta.no_edit.includes(e))
+      }).map(e => {
+        e.fieldTitle = meta && meta.titles && meta.titles[e] ? meta.titles[e] : changeCase.titleCase(e)
+        return e
+      })
     }
 
     this.log(templateData)

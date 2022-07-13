@@ -1,5 +1,5 @@
 <template lang="pug">
-q-item(:to="router" clickable)
+q-item(:to="route" clickable)
   q-item-section(avatar v-if="icon")
     q-icon(:name="icon")
   q-item-section

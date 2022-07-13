@@ -1,7 +1,6 @@
 <%_
   let collection = serviceName;
   let firstItem = isPaginated ? thejson[itemsName][0] : thejson[0];
-  let edit_fields = thekeys.filter(e => !(meta && meta.no_edit && meta.no_edit.includes(e)));
   let title = meta && meta.main_title ? meta.main_title : serviceNameTitleCase;
   let edit_columns = meta && meta.edit_columns ? meta.edit_columns : 2;
 _%>
@@ -61,7 +60,7 @@ q-page(padding)
 
               .row
                 .col-4.q-pa-md
-                  <%_ edit_fields.forEach(function(e, index) { -%>
+                  <%_ editFields.forEach(function(e, index) { -%>
                   // <%=e%> 
                   q-input(v-model="prospecto.ci" label="<%= serviceName %> *" color="positive"
                     lazy-rules class="q-mb-md")
@@ -114,9 +113,12 @@ q-page(padding)
 import { date, useQuasar } from 'quasar'
 import { onMounted, ref } from 'vue'
 import { api } from 'boot/axios'
-import ProspectoView from 'src/partials/ProspectoView.vue'
+// import ProspectoView from 'src/partials/ProspectoView.vue'
 
 const columns = [
+<%_ editFields.forEach(function(e, index) {
+    _%><%= e %><%_
+    }) -%>
   {
     name: 'fecha_alta',
     label: 'Fecha de Alta',
@@ -185,8 +187,8 @@ const clearProspecto = () => {
 }
 
 export default {
-  name: 'ProspectosPage',
-  components: { ProspectoView },
+  name: '<%= serviceNamePascalCase %>',
+  // components: { ProspectoView },
   setup() {
     const $q = useQuasar()
 
