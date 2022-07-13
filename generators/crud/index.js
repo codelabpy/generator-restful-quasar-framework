@@ -138,8 +138,10 @@ module.exports = class extends Generator {
       editFields: thekeys.filter(e => {
         return !(meta && meta.no_edit && meta.no_edit.includes(e))
       }).map(e => {
-        e.fieldTitle = meta && meta.titles && meta.titles[e] ? meta.titles[e] : changeCase.titleCase(e)
-        return e
+        return {
+          field: e,
+          fieldTitle: meta && meta.titles && meta.titles[e] ? meta.titles[e] : changeTitleCase.titleCase(e)
+        }
       })
     }
 
@@ -148,9 +150,9 @@ module.exports = class extends Generator {
     // this.fs.copy(`${this.templatePath()}/src`, `${this.destinationPath()}/src`)
 
     this.fs.copyTpl(
-      this.templatePath('Prospectos.vue.ejs'),
+      this.templatePath('Page.vue.ejs'),
       this.destinationPath(
-        'src/pages/' + changeCase.pascalCase(this.props.serviceName) + '.vue'
+        'src/pages/' + changeCase.pascalCase(this.props.serviceName) + 'Page.vue'
       ),
       templateData
     )
@@ -191,7 +193,7 @@ module.exports = class extends Generator {
 
     modifyDestFile('src/router/routes.js', (routesJs) => {
       // check routes.js content to avoid duplicate entries
-      if (utils.wordInText(templateData.serviceNamePascalCase, routesJs)) {
+      if (utils.wordInText(`${templateData.serviceNamePascalCase}Page.vue`, routesJs)) {
         return
       }
 
