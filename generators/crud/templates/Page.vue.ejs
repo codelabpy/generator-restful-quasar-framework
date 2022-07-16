@@ -142,9 +142,6 @@ export default {
       rowsNumber: 0 // xx if getting data from a server
     })
     const <%= serviceName %> = ref(clear<%= serviceNamePascalCase %>())
-    // const asesorList = ref([])
-    // const tipoDocumentoList = ref([])
-    // const tipoDocumentoSelected = ref(null)
 
     const onRequest = (props) => {
       const { page, rowsPerPage, sortBy, descending } = props.pagination
@@ -231,11 +228,6 @@ export default {
         pagination: pagination.value,
         filter: undefined
       })
-
-      // Se obtienen los datos de los selectores
-      // asesorList.value = (await api.get('/asesor', { params: { pagination: false } })).data
-      // tipoDocumentoList.value = (await api.post('/search/parametro', { dominio: 'tipo_documento' }, { params: { pagination: false } })).data
-      // console.log(tipoDocumentoList.value)
     })
 
     return {
@@ -245,9 +237,6 @@ export default {
       filter,
       <%= serviceName %>,
       loading,
-      // asesorList,
-      // tipoDocumentoList,
-      // tipoDocumentoSelected,
       pagination,
       new<%= serviceNamePascalCase %>,
       view<%= serviceNamePascalCase %>,
