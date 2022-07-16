@@ -1,5 +1,6 @@
 'use strict'
 const utils = require('../utils')
+const iconLists = require('./inconlists')
 const Generator = require('yeoman-generator')
 const path = require('path')
 const fs = require('fs')
@@ -125,10 +126,13 @@ module.exports = class extends Generator {
         : Object.keys(thejson)
     }
 
+    const icon = iconLists.iconsList[utils.generateRandom(iconLists.iconsList.length, this.props.serviceName)] 
+
     const templateData = {
       serviceName: this.props.serviceName,
       isPaginated: this.props.isPaginated,
       itemsName: this.props.itemsName,
+      icon: icon,
       serviceNameTitleCase: changeTitleCase.titleCase(this.props.serviceName),
       serviceNamePascalCase: changeCase.pascalCase(this.props.serviceName),
       thejson,
