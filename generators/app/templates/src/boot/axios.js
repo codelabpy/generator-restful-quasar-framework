@@ -1,4 +1,4 @@
-import { LocalStorage } from 'quasar'
+import { LocalStorage, Notify } from 'quasar'
 import { boot } from 'quasar/wrappers'
 import axios from 'axios'
 import constants from 'src/constants'
@@ -13,19 +13,37 @@ import auth from 'src/auth'
 const api = axios.create({ baseURL: constants.CONSULTAS_BACKEND_URL, withCredentials: true })
 
 export default boot(({ app, router }) => {
-  api.defaults.headers.common.Authorization = `Bearer ${LocalStorage.getItem(constants.AUTH_ACCESS_TOKEN_KEY)}`
+  api.defaults.headers.common.Authorization = `Bearer ${auth.accessToken}`
 
-  api.interceptors.response.use(async function (response) {
-    return response
-  }, function (error) {
-    if (error.response) {
-      if (error.response.status === 401 && error.response.data && error.response.data.error === 'Token has expired') {
+  api.interceptors.request.use(
+    async config => {
+      const token = LocalStorage.getItem(constants.AUTH_ACCESS_TOKEN_KEY)
+      if (config.url !== '/login' && !token) {
+        Notify.create({
+          type: 'warning',
+          message: 'Sesión expirada, por favor ingrese sus credenciales nuevamente'
+        })
         auth.logout()
         router.push(constants.AUTH_URL)
       }
-    }
-    return Promise.reject(error)
-  })
+      return config
+    })
+
+  api.interceptors.response.use(
+    response => response,
+    error => {
+      if (auth.isTokenError(error)) {
+        Notify.create({
+          type: 'warning',
+          message: 'Sesión expirada, por favor ingrese sus credenciales nuevamente'
+        })
+        auth.logout()
+        router.push(constants.AUTH_URL)
+        return new Promise(() => {})
+      } else {
+        return Promise.reject(error)
+      }
+    })
 
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
