@@ -78,7 +78,8 @@ module.exports = class extends Generator {
         type: 'input',
         name: 'metaJsonPath',
         message:
-          'Ingrese la ubicación del archivo de configuración opcional (ej. generator/user.meta.json)'
+          'Ingrese la ubicación del archivo de configuración opcional (ej. generator/user.meta.json)',
+        default: (answers) => `generator/${answers.serviceName}.meta.json`
       }
     ]
 
@@ -128,6 +129,13 @@ module.exports = class extends Generator {
 
     const icon = iconLists.iconsList[utils.generateRandom(iconLists.iconsList.length, this.props.serviceName)] 
 
+    const fields = thekeys.map(e => {
+      return {
+        field: e,
+        fieldTitle: meta && meta.titles && meta.titles[e] ? meta.titles[e] : changeTitleCase.titleCase(e)
+      }
+    })
+
     const templateData = {
       serviceName: this.props.serviceName,
       isPaginated: this.props.isPaginated,
@@ -139,13 +147,11 @@ module.exports = class extends Generator {
       meta,
       changeCase,
       thekeys,
-      editFields: thekeys.filter(e => {
-        return !(meta && meta.no_edit && meta.no_edit.includes(e))
-      }).map(e => {
-        return {
-          field: e,
-          fieldTitle: meta && meta.titles && meta.titles[e] ? meta.titles[e] : changeTitleCase.titleCase(e)
-        }
+      listFields: fields.filter(e => {
+        return !(meta && meta.no_list && meta.no_list.includes(e.field))
+      }),
+      editFields: fields.filter(e => {
+        return !(meta && meta.no_edit && meta.no_edit.includes(e.field))
       })
     }
 

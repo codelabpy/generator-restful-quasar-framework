@@ -2,7 +2,6 @@
   let collection = serviceName;
   let firstItem = isPaginated ? thejson[itemsName][0] : thejson[0];
   let title = meta && meta.main_title ? meta.main_title : serviceNameTitleCase;
-  let edit_columns = meta && meta.edit_columns ? meta.edit_columns : 2;
   let firstField = editFields[0];
 _%>
 <template lang="pug">
@@ -12,7 +11,7 @@ q-page(padding)
   section(v-if="view === 'list'")
     .q-pa-md
       q-table(
-        title="<%= serviceNameTitleCase %>"
+        title="<%= title %>"
         :rows="rows"
         :columns="columns"
         @request="onRequest"
@@ -48,22 +47,23 @@ q-page(padding)
   section(v-if="view === 'new'")
     q-card.avalon-card-page
       q-card-section
-        .text-h6 Nuevo <%= serviceNameTitleCase %>
+        .text-h6 Nuevo <%= title %>
         .text-subtitle2 Complete los datos solicitados
       q-separator
 
       q-card-section.flex.flex-center
         q-card(flat bordered v-bind:style="{'width': '60%'}")
           q-card-section
-            q-form(@submit="onSubmit" ref="prospectForm" class="q-gutter-md" color="positive")
 
-              .row
-                .col-4.q-pa-md
-                  <%_ editFields.forEach(function(e, index) { -%>
-                  // <%= e.field %>
-                  q-input(v-model="<%= serviceName %>.<%= e.field %>" label="<%= e.fieldTitle %> *")
-                    template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
-                  <%_ }) -%>
+            q-form(@submit="onSubmit" ref="prospectForm" class="q-gutter-md" color="positive")
+              .q-pa-md
+                .q-gutter-md.row
+                  .col
+
+                    <%_ editFields.forEach(function(e, index) { -%>
+                    q-input(v-model="<%= serviceName %>.<%= e.field %>" label="<%= e.fieldTitle %> *")
+                      template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
+                    <%_ }) -%>
 
           q-separator
 
@@ -75,7 +75,7 @@ q-page(padding)
   section(v-if="view === 'view'")
     q-card.avalon-card-page
       q-card-section
-        .text-h6 Visualizar <%= serviceNameTitleCase %>
+        .text-h6 Visualizar <%= title %>
         //.text-subtitle2 Complete los datos solicitados
       q-separator
 
@@ -98,7 +98,7 @@ import { api } from 'boot/axios'
 // for transitive values ==> field: row => row.tipo_documento?.valor,
 
 const columns = [
-<%_ editFields.forEach(function(e, index) { -%>
+<%_ listFields.forEach(function(e, index) { -%>
   {
     name: '<%= e.field %>',
     label: '<%= e.fieldTitle %>',
@@ -166,8 +166,8 @@ export default {
         })
         .catch(() => {
           $q.notify({
-            icon: 'negative',
-            message: 'Ocurrió un error al obtener lista de <%= serviceNameTitleCase %>'
+            type: 'negative',
+            message: 'Ocurrió un error al obtener lista de <%= title %>'
           })
         })
         // eslint-disable-next-line no-return-assign
@@ -196,7 +196,7 @@ export default {
           console.log(response.data)
           $q.notify({
             type: 'positive',
-            message: 'El <%= serviceNameTitleCase %> fue agregado'
+            message: 'El <%= title %> fue agregado'
           })
           // Se redirecciona a la lista de prospectos
           view.value = 'list'
@@ -208,7 +208,7 @@ export default {
         .catch(() => {
           $q.notify({
             type: 'warning',
-            message: 'Ocurrió un error al grabar el <%= serviceNameTitleCase %>'
+            message: 'Ocurrió un error al grabar el <%= title %>'
           })
         })
         // eslint-disable-next-line no-return-assign
