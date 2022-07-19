@@ -55,16 +55,15 @@ q-page(padding)
         q-card(flat bordered v-bind:style="{'width': '60%'}")
           q-card-section
 
-            q-form(@submit="onSubmit" ref="prospectForm" class="q-gutter-md" color="positive")
+            q-form(@submit="onSubmit" class="q-gutter-md" color="positive")
               .q-pa-md
                 .q-gutter-md.row
                   .col
-
                     <%_ editFields.forEach(function(e, index) { -%>
-                    q-input(v-model="<%= serviceName %>.<%= e.field %>" label="<%= e.fieldTitle %> *")
+                    q-input(v-model="<%= serviceName %>.<%= e.field %>" label="<%= e.fieldTitle %> *"<% if(index === 0) { %> autofocus<% } %>)
                       template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
-                    <%_ }) -%>
 
+                    <%_ }) -%>
           q-separator
 
           q-card-actions(align="around")
@@ -76,11 +75,16 @@ q-page(padding)
     q-card.avalon-card-page
       q-card-section
         .text-h6 Visualizar <%= title %>
-        //.text-subtitle2 Complete los datos solicitados
-      q-separator
 
-      // ProspectoView(:prospecto="prospecto")
-      // q-separator
+        .q-pa-md
+          .q-gutter-md.row
+            .col
+            <%_ listFields.forEach(function(e, index) { -%>
+              .text-h6 <%= e.fieldTitle %>
+              p {{<%= serviceName %>.<%= e.field %>}}
+
+            <%_ }) -%>
+      q-separator
 
       q-card-actions(align="around")
         q-btn(@click="view = 'list'" flat) Volver
@@ -198,7 +202,7 @@ export default {
             type: 'positive',
             message: 'El <%= title %> fue agregado'
           })
-          // Se redirecciona a la lista de prospectos
+          // Se redirecciona a la lista
           view.value = 'list'
           onRequest({
             pagination: pagination.value,

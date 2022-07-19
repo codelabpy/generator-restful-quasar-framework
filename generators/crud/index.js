@@ -26,7 +26,7 @@ module.exports = class extends Generator {
         name: 'path',
         message:
           'Ingrese el path del servicio RESTful a construir las vistas crud',
-        default: '/user'
+        default: '/departamento'
       },
       {
         type: 'confirm',
@@ -78,8 +78,8 @@ module.exports = class extends Generator {
         type: 'input',
         name: 'metaJsonPath',
         message:
-          'Ingrese la ubicación del archivo de configuración opcional (ej. generator/user.meta.json)',
-        default: (answers) => `generator/${answers.serviceName}.meta.json`
+          'Ingrese la ubicación del archivo de configuración opcional (ej. generator/user.meta.json)'
+        // default: (answers) => `generator/${answers.serviceName}.meta.json`
       }
     ]
 
@@ -92,17 +92,22 @@ module.exports = class extends Generator {
 
   async writing () {
     let thejson
-    if (this.props.authRequired) {
-      thejson = await rp(this.props.jsonUrl, {
-        headers: {
-          Authorization: this.props.authHeader
-        },
-        json: true
-      })
-    } else {
-      thejson = await rp(this.props.jsonUrl, {
-        json: true
-      })
+    try {
+      if (this.props.authRequired) {
+        thejson = await rp(this.props.jsonUrl, {
+          headers: {
+            Authorization: this.props.authHeader
+          },
+          json: true
+        })
+      } else {
+        thejson = await rp(this.props.jsonUrl, {
+          json: true
+        })
+      }
+    } catch (error) {
+      this.log(`Error obtaining data from ${this.props.jsonUrl}`, error)
+      process.exit(1)
     }
 
     let meta
@@ -119,12 +124,17 @@ module.exports = class extends Generator {
 
     let thekeys
 
-    if (this.props.isPaginated) {
-      thekeys = Object.keys(thejson[this.props.itemsName][0])
-    } else {
-      thekeys = Array.isArray(thejson)
-        ? Object.keys(thejson[0])
-        : Object.keys(thejson)
+    try {
+      if (this.props.isPaginated) {
+        thekeys = Object.keys(thejson[this.props.itemsName][0])
+      } else {
+        thekeys = Array.isArray(thejson)
+          ? Object.keys(thejson[0])
+          : Object.keys(thejson)
+      }
+    } catch (error) {
+      this.log(`Error reading json items. There is no data?`, error)
+      process.exit(2)
     }
 
     const icon = iconLists.iconsList[utils.generateRandom(iconLists.iconsList.length, this.props.serviceName)] 
