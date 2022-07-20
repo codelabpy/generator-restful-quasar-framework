@@ -78,8 +78,8 @@ module.exports = class extends Generator {
         type: 'input',
         name: 'metaJsonPath',
         message:
-          'Ingrese la ubicación del archivo de configuración opcional (ej. generator/user.meta.json)'
-        // default: (answers) => `generator/${answers.serviceName}.meta.json`
+          'Ingrese la ubicación del archivo de configuración opcional (ej. generator/user.meta.json)',
+          default: (answers) => `generator/${answers.serviceName}.meta.json`
       }
     ]
 
@@ -137,7 +137,8 @@ module.exports = class extends Generator {
       process.exit(2)
     }
 
-    const icon = iconLists.iconsList[utils.generateRandom(iconLists.iconsList.length, this.props.serviceName)] 
+    const icon = meta && meta.icon ? meta.icon : 
+      iconLists.iconsList[utils.generateRandom(iconLists.iconsList.length, this.props.serviceName)] 
 
     const fields = thekeys.map(e => {
       return {
@@ -225,11 +226,11 @@ module.exports = class extends Generator {
       }
 
       let before = routesJs.substring(0, indexPageIndex + 17)
-      let after = routesJs.substring(indexPageIndex + 18)
+      let after = routesJs.substring(indexPageIndex + 19)
       let jsonRoute = this.fs.read(this.templatePath("json_route_router.ejs"));
 
       return ejs.render(
-        before + `${jsonRoute}${hasMoreRoutes ? ',' : ''}` + after,
+        before + `${jsonRoute.slice(0, -1)}${hasMoreRoutes ? ',\n' : '\n'}` + after,
         templateData
       )
     })

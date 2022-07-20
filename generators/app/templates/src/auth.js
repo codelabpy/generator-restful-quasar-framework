@@ -44,8 +44,9 @@ const auth = {
     this.currentUser = undefined
     this.accessToken = undefined
     this.payload = undefined
-    LocalStorage.remove(constants.AUTH_ACCESS_TOKEN_KEY)
-    LocalStorage.remove(constants.AUTH_USER_KEY)
+    LocalStorage.clear()
+    // LocalStorage.remove(constants.AUTH_ACCESS_TOKEN_KEY)
+    // LocalStorage.remove(constants.AUTH_USER_KEY)
   },
   isTokenError(error) {
     return error.response &&
