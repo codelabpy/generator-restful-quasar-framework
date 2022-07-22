@@ -10,46 +10,17 @@ q-page(padding)
   // List
   section(v-if="view === 'list'")
     .q-pa-md
-      q-table(
+      c-table(
+        icon="<%= icon %>"
         title="<%= title %>"
         :rows="rows"
         :columns="columns"
-        @request="onRequest"
-        row-key="name"
-        no-data-label="No hay datos"
-        no-results-label="El filtro no encontró resultados"
         :loading="loading"
-        :loading-label="'Cargando...'"
-        v-model:pagination="pagination"
-        :filter="filter"
-      )
-        template(v-slot:top-left)
-          .row
-            q-icon.col-8(name="<%= icon %>" size="1.5rem")
-            .col.q-table__title <%= title %>
-        template(v-slot:top-right)
-          .col-9
-            q-input(borderless dense debounce="300" v-model="filter" placeholder="Buscar" filled color="positive" )
-              template(v-slot:append)
-                q-icon(name="search")
-          .row.col-3
-            q-btn(@click="new<%= serviceNamePascalCase %>()" color="positive" icon="add" round flat)
-              q-tooltip Nuevo
-        template(v-slot:body="props")
-          q-tr(:props="props")
-            q-td(v-for="col in props.cols" :key="col.name" :props="props")
-              template(v-if="col.name === 'action'")
-                q-btn(@click="view<%= serviceNamePascalCase %>(props.row)" color="positive" icon="remove_red_eye" round flat dense)
-                  q-tooltip Visualizar
-              template(v-else) {{ col.value }}
-        template(v-slot:no-data="{ icon, message, filter }")
-          .full-width.row.flex-center.q-gutter-sm
-            span {{ message }}
-            q-icon(size="2em" :name="filter ? 'filter_b_and_w' : icon")
+        @request="onRequest" @add="new<%= serviceNamePascalCase %>()" @view="view<%= serviceNamePascalCase %>")
 
   // Edit
   section(v-if="view === 'new'")
-    q-card.avalon-card-page
+    q-card
       q-card-section
         .text-h6 Nuevo <%= title %>
         .text-subtitle2 Complete los datos solicitados
@@ -76,7 +47,7 @@ q-page(padding)
 
   // Vista de visualización
   section(v-if="view === 'view'")
-    q-card.avalon-card-page
+    q-card
       q-card-section
         .text-h6 Visualizar <%= title %>
 
@@ -139,51 +110,17 @@ export default {
 
     const view = ref('list')
     const rows = ref([])
-    const filter = ref('')
     const loading = ref(false)
+
+    // Ref to mantain the pagination state when the c-table is removed from the dom (with v-if)
     const pagination = ref({
       sortBy: '<%= firstField.e %>',
       descending: true,
       page: 1,
       rowsPerPage: 10,
-      rowsNumber: 0 // xx if getting data from a server
+      rowsNumber: 0
     })
     const <%= serviceName %> = ref(clear<%= serviceNamePascalCase %>())
-
-    const onRequest = (props) => {
-      const { page, rowsPerPage, sortBy, descending } = props.pagination
-      const filter = props.filter
-
-      // Init loading
-      loading.value = true
-
-      // Merge params in object for backend
-      const paramsBackend = { page, rowsPerPage, sortBy, descending, jsondepth: 1 }
-
-      api.post('/search/<%= serviceName %>', { <%= firstField.field %>: filter }, { params: paramsBackend })
-        .then(response => {
-          // assign received row
-          rows.value = response.data.items
-
-          // setup received pagination config
-          pagination.value.page = page
-          pagination.value.rowsPerPage = rowsPerPage
-          pagination.value.sortBy = sortBy
-          pagination.value.descending = descending
-          pagination.value.rowsNumber = response.data.total
-        })
-        .catch(() => {
-          $q.notify({
-            type: 'negative',
-            message: 'Ocurrió un error al obtener lista de <%= title %>'
-          })
-        })
-        // eslint-disable-next-line no-return-assign
-        .finally(() =>
-          // Finish loading
-          loading.value = false
-        )
-    }
 
     const new<%= serviceNamePascalCase %> = () => {
       <%= serviceName %>.value = clear<%= serviceNamePascalCase %>()
@@ -195,33 +132,68 @@ export default {
       view.value = 'view'
     }
 
-    const onSubmit = () => {
+    const updatePagination = (newPagination, total) => {
+      const { page, rowsPerPage, sortBy, descending } = newPagination
+      pagination.value.page = page
+      pagination.value.rowsPerPage = rowsPerPage
+      pagination.value.sortBy = sortBy
+      pagination.value.descending = descending
+      pagination.value.rowsNumber = total
+    }
+
+    const onRequest = async (props) => {
+      const { page, rowsPerPage, sortBy, descending } = props.pagination
+      const filter = props.filter
+
+      // Merge params in object for backend
+      const paramsBackend = { page, rowsPerPage, sortBy, descending, jsondepth: 1 }
+
+      // Init loading
       loading.value = true
 
-      // TODO: sincronizar con respuesta del backend
-      api.post('/<%= serviceName %>', <%= serviceName %>.value)
-        .then(response => {
-          $q.notify({
-            type: 'positive',
-            message: 'El <%= title %> fue agregado'
-          })
-          // Se redirecciona a la lista
-          view.value = 'list'
-          onRequest({
-            pagination: pagination.value,
-            filter: undefined
-          })
+      try {
+        const response = await api.post('/search/<%= serviceName %>', { <%= firstField.field %>: filter }, { params: paramsBackend })
+        // assign received rows
+        rows.value = response.data.items
+        // update local pagination object
+        updatePagination(props.pagination, response.data.total)
+      } catch (error) {
+        $q.notify({
+          type: 'negative',
+          message: 'Ocurrió un error al obtener lista de <%= title %>'
         })
-        .catch(() => {
-          $q.notify({
-            type: 'warning',
-            message: 'Ocurrió un error al grabar el <%= title %>'
-          })
+      } finally {
+        // Finish loading
+        loading.value = false
+      }
+    }
+
+    const onSubmit = async () => {
+      loading.value = true
+
+      try {
+        await api.post('/<%= serviceName %>', <%= serviceName %>.value)
+
+        $q.notify({
+          type: 'positive',
+          message: 'El <%= title %> fue agregado'
         })
-        // eslint-disable-next-line no-return-assign
-        .finally(() =>
-          loading.value = false
-        )
+
+        // Se redirecciona a la lista
+        view.value = 'list'
+        onRequest({
+          pagination: pagination.value,
+          filter: undefined
+        })
+      } catch (error) {
+        console.log(error)
+        $q.notify({
+          type: 'warning',
+          message: 'Ocurrió un error al grabar el <%= title %>'
+        })
+      } finally {
+        loading.value = false
+      }
     }
 
     onMounted(async () => {
@@ -235,7 +207,6 @@ export default {
       view,
       columns,
       rows,
-      filter,
       <%= serviceName %>,
       loading,
       pagination,

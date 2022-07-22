@@ -168,7 +168,7 @@ module.exports = class extends Generator {
 
     this.log(templateData)
 
-    // this.fs.copy(`${this.templatePath()}/src`, `${this.destinationPath()}/src`)
+    this.fs.copy(`${this.templatePath()}/src`, `${this.destinationPath()}/src`)
 
     this.fs.copyTpl(
       this.templatePath('Page.vue.ejs'),
@@ -196,14 +196,15 @@ module.exports = class extends Generator {
         return
       }
 
-      const menuLinksIndex = mainLayoutJs.indexOf('menuLinks = [')
+      const pattern = `    route: '/'\n  },`
+      const menuLinksIndex = mainLayoutJs.indexOf(pattern)
 
       if (menuLinksIndex === -1) {
         throw new Error('No definition found in MenuLinks')
       }
 
-      let before = mainLayoutJs.substring(0, menuLinksIndex + 13)
-      let after = mainLayoutJs.substring(menuLinksIndex + 14)
+      let before = mainLayoutJs.substring(0, menuLinksIndex + pattern.length)
+      let after = mainLayoutJs.substring(menuLinksIndex + pattern.length + 1)
       let jsonMenuLink = this.fs.read(this.templatePath("json_menu_link.ejs"));
 
       return ejs.render(
@@ -231,6 +232,28 @@ module.exports = class extends Generator {
 
       return ejs.render(
         before + `${jsonRoute.slice(0, -1)}${hasMoreRoutes ? ',\n' : '\n'}` + after,
+        templateData
+      )
+    })
+
+    modifyDestFile('quasar.config.js', (quasarConf) => {
+      // check routes.js content to avoid duplicate entries
+      if (utils.wordInText('global-components', quasarConf)) {
+        return
+      }
+
+      let startIndex = quasarConf.indexOf("'navigation-guard'")
+      let hasMore = quasarConf.indexOf("'navigation-guard',") !== -1
+
+      if (startIndex === -1) {
+        throw new Error('No definition found in navigation-guard')
+      }
+
+      let before = quasarConf.substring(0, startIndex + 18)
+      let after = quasarConf.substring(startIndex + 19)
+
+      return ejs.render(
+        before + `,\n      'global-components'${hasMore ? ',' : ''}\n` + after,
         templateData
       )
     })
