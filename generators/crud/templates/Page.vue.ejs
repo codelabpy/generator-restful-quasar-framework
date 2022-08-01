@@ -10,19 +10,14 @@ q-page(padding)
   // List
   section(v-if="view === 'list'")
     .q-pa-md
-      c-table(
-        icon="<%= icon %>"
-        title="<%= title %>"
-        :rows="rows"
-        :columns="columns"
-        :loading="loading"
-        @request="onRequest" @add="new<%= serviceNamePascalCase %>()" @view="view<%= serviceNamePascalCase %>")
+      c-table(icon="<%= icon %>" title="<%= title %>" :rows="rows" :columns="columns" :loading="loading"
+        @request="onRequest" @add="new<%= serviceNamePascalCase %>" @edit="edit<%= serviceNamePascalCase %>" @view="view<%= serviceNamePascalCase %>")
 
   // Edit
-  section(v-if="view === 'new'")
+  section(v-if="view === 'new' || view === 'edit'")
     q-card
       q-card-section
-        .text-h6 Nuevo <%= title %>
+        .text-h6 {{ view === 'edit' ? 'Editar' : 'Nuevo' }} <%= title %>
         .text-subtitle2 Complete los datos solicitados
       q-separator
 
@@ -162,6 +157,15 @@ export default {
       view.value = 'new'
     }
 
+    const edit<%= serviceNamePascalCase %> = async (instance) => {
+  <%_ for (let rn in relations) { -%>
+  <%_   const rel = relations[rn] -%>
+      instance.<%= rel.dependent_attr %> = instance.<%= rel.originModel %>?.<%= rel.origin_attr %>
+  <%_ } -%>
+      <%= serviceName %>.value = instance
+      view.value = 'edit'
+    }
+
     const view<%= serviceNamePascalCase %> = async (instance) => {
       <%= serviceName %>.value = instance
       view.value = 'view'
@@ -246,6 +250,7 @@ export default {
       loading,
       pagination,
       new<%= serviceNamePascalCase %>,
+      edit<%= serviceNamePascalCase %>,
       view<%= serviceNamePascalCase %>,
       onSubmit,
       onRequest

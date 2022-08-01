@@ -33,6 +33,8 @@ q-table(
     q-tr(:props="props")
       q-td(v-for="col in props.cols" :key="col.name" :props="props")
         template(v-if="col.name === 'action'")
+          q-btn(@click="editClicked(props.row)" color="positive" icon="edit" round flat dense)
+            q-tooltip Edit
           q-btn(@click="viewClicked(props.row)" color="positive" icon="remove_red_eye" round flat dense)
             q-tooltip Visualizar
         template(v-else) {{ col.value }}
@@ -64,10 +66,14 @@ export default {
       default: null
     }
   },
-  emits: ['add', 'view', 'request'],
+  emits: ['add', 'edit', 'view', 'request'],
   setup(_, ctx) {
     const filter = ref('')
     const pagination = ref(null)
+
+    const editClicked = (row) => {
+      ctx.emit('edit', row)
+    }
 
     const viewClicked = (row) => {
       ctx.emit('view', row)
@@ -76,6 +82,7 @@ export default {
     return {
       pagination,
       filter,
+      editClicked,
       viewClicked
     }
   }
