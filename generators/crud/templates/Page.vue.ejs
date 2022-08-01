@@ -34,10 +34,16 @@ q-page(padding)
               .q-pa-md
                 .q-gutter-md.row
                   .col
-                    <%_ editFields.forEach(function(e, index) { -%>
+                  <%_ editFields.forEach((e, index) => { -%>
+                      <%_ if(relations && relations[e.field]) { -%>
+                        <%_ const rel = relations[e.field] -%>
+                    <%= rel.originModelSnakeCase %>-select(v-model="<%= serviceName %>.<%= rel.dependent_attr %>")
+
+                      <%_ } else { -%>
                     q-input(v-model="<%= serviceName %>.<%= e.field %>" label="<%= e.fieldTitle %> *"<% if(index === 0) { %> autofocus<% } %>)
                       template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
 
+                      <%_ }-%>
                     <%_ }) -%>
           q-separator
 
@@ -54,10 +60,16 @@ q-page(padding)
         .q-pa-md
           .q-gutter-md.row
             .col
-            <%_ listFields.forEach(function(e, index) { -%>
+            <%_ listFields.forEach(e => { -%>
               .text-h6 <%= e.fieldTitle %>
+              <%_ if(relations && relations[e.field]) { -%>
+                <%_ const rel = relations[e.field] -%>
+              p {{<%= serviceName %>.<%= e.field %>?.<%= rel.label_attr %>}}
+
+              <%_ } else { -%>
               p {{<%= serviceName %>.<%= e.field %>}}
 
+              <%_ }-%>
             <%_ }) -%>
       q-separator
 
@@ -72,12 +84,26 @@ q-page(padding)
 import { useQuasar } from 'quasar'
 import { onMounted, ref } from 'vue'
 import { api } from 'boot/axios'
+<%_ for (let rn in relations) { -%>
+<%_   const rel = relations[rn] -%>
+import <%= rel.originModelPascalCase %>Select from '../components/<%= rel.originModelSnakeCase %>/<%= rel.originModelPascalCase %>Select.vue'
+<%_ } -%>
 
 // for date values ==> field: row => date.formatDate(row.fecha_alta, 'YYYY-MM-DD'),
 // for transitive values ==> field: row => row.tipo_documento?.valor,
 
 const columns = [
-<%_ listFields.forEach(function(e, index) { -%>
+<%_ listFields.forEach(e => { -%>
+  <%_ if(relations && relations[e.field]) { -%>
+    <%_ const rel = relations[e.field] -%>
+  {
+    name: '<%= e.field %>',
+    label: '<%= e.fieldTitle %>',
+    align: 'left',
+    field: row => row.<%= e.field %>?.<%= rel.label_attr %> ? row.<%= e.field %>.<%= rel.label_attr %> : '',
+    sortable: true
+  },
+  <%_ } else { -%>
   {
     name: '<%= e.field %>',
     label: '<%= e.fieldTitle %>',
@@ -85,6 +111,7 @@ const columns = [
     field: '<%= e.field %>',
     sortable: true
   },
+  <%_ }-%>
 <%_ }) -%>
   {
     name: 'action',
@@ -96,7 +123,7 @@ const columns = [
 
 const clear<%= serviceNamePascalCase %> = () => {
   return {
-<%_ editFields.forEach(function(e, index) { -%>
+  <%_ editFields.forEach((e, index) => { -%>
     <%= e.field %>: null<% if (index !== editFields.length - 1) {%>,<%_}%>
 <%_ }) -%>
   }
@@ -104,6 +131,14 @@ const clear<%= serviceNamePascalCase %> = () => {
 
 export default {
   name: '<%= serviceNamePascalCase %>Page',
+<%_ if(relations) { -%>
+  components: {
+  <%_ for (let rn in relations) { -%>
+  <%_   const rel = relations[rn] -%>
+    <%= rel.originModelPascalCase %>Select
+  <%_ } -%>
+  },
+<%_ } -%>
 
   setup() {
     const $q = useQuasar()

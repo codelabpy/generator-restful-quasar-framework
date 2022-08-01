@@ -12,7 +12,7 @@ const changeTitleCase = require('title-case')
 
 module.exports = class extends Generator {
 
-  async prompting () {
+  async prompting() {
     const prompts = [
       {
         type: 'input',
@@ -79,7 +79,7 @@ module.exports = class extends Generator {
         name: 'metaJsonPath',
         message:
           'Ingrese la ubicación del archivo de configuración opcional (ej. generator/user.meta.json)',
-          default: (answers) => `generator/${answers.serviceName}.meta.json`
+        default: (answers) => `generator/${answers.serviceName}.meta.json`
       }
     ]
 
@@ -90,7 +90,7 @@ module.exports = class extends Generator {
     })
   }
 
-  async writing () {
+  async writing() {
     let thejson
     try {
       if (this.props.authRequired) {
@@ -137,8 +137,8 @@ module.exports = class extends Generator {
       process.exit(2)
     }
 
-    const icon = meta && meta.icon ? meta.icon : 
-      iconLists.iconsList[utils.generateRandom(iconLists.iconsList.length, this.props.serviceName)] 
+    const icon = meta && meta.icon ? meta.icon :
+      iconLists.iconsList[utils.generateRandom(iconLists.iconsList.length, this.props.serviceName)]
 
     const fields = thekeys.map(e => {
       return {
@@ -147,43 +147,63 @@ module.exports = class extends Generator {
       }
     })
 
+
+    const serviceNameTitleCase = changeTitleCase.titleCase(this.props.serviceName)
+    const serviceNamePascalCase = changeCase.pascalCase(this.props.serviceName)
+
     const templateData = {
       serviceName: this.props.serviceName,
       isPaginated: this.props.isPaginated,
       itemsName: this.props.itemsName,
       icon: icon,
-      serviceNameTitleCase: changeTitleCase.titleCase(this.props.serviceName),
-      serviceNamePascalCase: changeCase.pascalCase(this.props.serviceName),
+      serviceNameTitleCase,
+      serviceNamePascalCase,
       thejson,
       meta,
       changeCase,
       thekeys,
       listFields: fields.filter(e => {
-        return !(meta && meta.no_list && meta.no_list.includes(e.field))
+        return !meta?.no_list?.includes(e.field)
       }),
       editFields: fields.filter(e => {
-        return !(meta && meta.no_edit && meta.no_edit.includes(e.field))
+        return !meta?.no_edit?.includes(e.field)
       }),
-      relations: fields.filter(e => {
-        return meta && meta.relations && meta.relations[e.field]
-      })
+      relations: meta?.relations
     }
 
     this.log(templateData)
+
+    // Process simple relations (ensure this is processed first in order to get
+    // relationship info on other templates)
+    for (let rn in templateData.relations) {
+      const rel = templateData.relations[rn]
+      // inject relationship info
+      rel.originModel = rel.origin_model
+      rel.originModelTitleCase = changeTitleCase.titleCase(rel.origin_model)
+      rel.originModelPascalCase = changeCase.pascalCase(rel.origin_model)
+      rel.originModelSnakeCase = changeCase.snakeCase(rel.origin_model)
+      // process and create specific component
+      this.fs.copyTpl(
+        this.templatePath('ModelSelect.vue.ejs'),
+        this.destinationPath(`src/components/${rel.originModel}/${rel.originModelPascalCase}Select.vue`),
+        {
+          title: meta?.main_title ? meta?.main_title : serviceNameTitleCase,
+          ...rel,
+        }
+      )
+    }
 
     this.fs.copy(`${this.templatePath()}/src`, `${this.destinationPath()}/src`)
 
     this.fs.copyTpl(
       this.templatePath('Page.vue.ejs'),
-      this.destinationPath(
-        'src/pages/' + changeCase.pascalCase(this.props.serviceName) + 'Page.vue'
-      ),
+      this.destinationPath(`src/pages/${serviceNamePascalCase}Page.vue`),
       templateData
     )
 
     const dis = this
 
-    function modifyDestFile (filename, withThis) {
+    function modifyDestFile(filename, withThis) {
       if (dis.fs.exists(dis.destinationPath(filename))) {
         const fileString = dis.fs.read(dis.destinationPath(filename))
         const newFileString = withThis(fileString)
@@ -263,13 +283,4 @@ module.exports = class extends Generator {
 
   }
 
-  install () {
-    // if (this.options['skip-install']) {
-    //   return
-    // }
-
-    // if (this.options.packageJsonModified) {
-    //   this.spawnCommand('npm', ['install'])
-    // }
-  }
 }
