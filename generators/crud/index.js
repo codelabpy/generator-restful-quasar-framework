@@ -163,6 +163,9 @@ module.exports = class extends Generator {
       }),
       editFields: fields.filter(e => {
         return !(meta && meta.no_edit && meta.no_edit.includes(e.field))
+      }),
+      relations: fields.filter(e => {
+        return meta && meta.relations && meta.relations[e.field]
       })
     }
 
