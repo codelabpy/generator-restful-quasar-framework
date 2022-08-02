@@ -43,7 +43,7 @@ q-page(padding)
           q-separator
 
           q-card-actions(align="around")
-            q-btn(@click="view = 'list'" flat) Volver
+            q-btn(@click="cancelEdit" flat) Volver
             q-btn(flat color="positive" @click.prevent="onSubmit" :loading="loading") Grabar
 
   // Vista de visualización
@@ -124,6 +124,9 @@ const clear<%= serviceNamePascalCase %> = () => {
   }
 }
 
+let instanceRef = null
+let previousValues = {}
+
 export default {
   name: '<%= serviceNamePascalCase %>Page',
 <%_ if(relations) { -%>
@@ -158,6 +161,8 @@ export default {
     }
 
     const edit<%= serviceNamePascalCase %> = async (instance) => {
+      instanceRef = instance
+      previousValues = { ...instance }
   <%_ for (let rn in relations) { -%>
   <%_   const rel = relations[rn] -%>
       instance.<%= rel.dependent_attr %> = instance.<%= rel.originModel %>?.<%= rel.origin_attr %>
@@ -169,6 +174,11 @@ export default {
     const view<%= serviceNamePascalCase %> = async (instance) => {
       <%= serviceName %>.value = instance
       view.value = 'view'
+    }
+
+    const cancelEdit = _ => {
+      Object.assign(instanceRef, previousValues)
+      view.value = 'list'
     }
 
     const updatePagination = (newPagination, total) => {
@@ -211,12 +221,16 @@ export default {
       loading.value = true
 
       try {
-        await api.post('/<%= serviceName %>', <%= serviceName %>.value)
+        let message
+        if (view.value === 'new') {
+          await api.post('/<%= serviceName %>', <%= serviceName %>.value)
+          message = '<%= title %> agregado correctamente'
+        } else {
+          await api.put(`/<%= serviceName %>/${departamento.value.id}`, departamento.value)
+          message = '<%= title %> editado correctamente'
+        }
 
-        $q.notify({
-          type: 'positive',
-          message: 'El <%= title %> fue agregado'
-        })
+        $q.notify({ type: 'positive', message })
 
         // Se redirecciona a la lista
         view.value = 'list'
@@ -252,6 +266,7 @@ export default {
       new<%= serviceNamePascalCase %>,
       edit<%= serviceNamePascalCase %>,
       view<%= serviceNamePascalCase %>,
+      cancelEdit,
       onSubmit,
       onRequest
     }
