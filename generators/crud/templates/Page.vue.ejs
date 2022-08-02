@@ -226,7 +226,7 @@ export default {
           await api.post('/<%= serviceName %>', <%= serviceName %>.value)
           message = '<%= title %> agregado correctamente'
         } else {
-          await api.put(`/<%= serviceName %>/${departamento.value.id}`, departamento.value)
+          await api.put(`/<%= serviceName %>/${<%= serviceName %>.value.id}`, <%= serviceName %>.value)
           message = '<%= title %> editado correctamente'
         }
 
