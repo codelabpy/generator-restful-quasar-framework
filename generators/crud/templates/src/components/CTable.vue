@@ -19,8 +19,8 @@ q-table(
 )
   template(v-slot:top-left)
     .row
-      q-icon.col-8(name="public" size="1.5rem")
-      .col.q-table__title {{ title }}
+      q-icon(v-if="icon" :name="icon" size="1.5rem")
+      .q-pl-md.q-table__title {{ title }}
   template(v-slot:top-right)
     .col-9
       q-input(borderless dense debounce="300" v-model="filter" placeholder="Buscar" filled color="positive" )
@@ -52,6 +52,10 @@ export default {
     title: {
       type: String,
       default: null
+    },
+    icon: {
+      type: String,
+      default: 'home'
     },
     rows: {
       type: Array,
