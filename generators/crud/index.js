@@ -160,6 +160,7 @@ module.exports = class extends Generator {
       serviceNamePascalCase,
       thejson,
       meta,
+      title: meta?.main_title ? meta.main_title : serviceNameTitleCase,
       changeCase,
       thekeys,
       listFields: fields.filter(e => {
