@@ -26,7 +26,7 @@ module.exports = class extends Generator {
         name: 'path',
         message:
           'Ingrese el path del servicio RESTful a construir las vistas crud',
-        default: '/departamento'
+        default: '/entidad_financiera'
       },
       {
         type: 'confirm',
@@ -122,34 +122,28 @@ module.exports = class extends Generator {
       }
     }
 
-    let thekeys
+    let firstElement
+    let fields
 
     try {
-      if (this.props.isPaginated) {
-        thekeys = Object.keys(thejson[this.props.itemsName][0])
-      } else {
-        thekeys = Array.isArray(thejson)
-          ? Object.keys(thejson[0])
-          : Object.keys(thejson)
-      }
+      firstElement = (this.props.isPaginated ? thejson[this.props.itemsName] : thejson)[0]
+      fields = Object.keys(firstElement).map(e => {
+        return {
+          field: e,
+          fieldTitle: meta && meta.titles && meta.titles[e] ? meta.titles[e] : changeTitleCase.titleCase(e),
+          fieldType: typeof firstElement[e]
+        }
+      })
     } catch (error) {
       this.log(`Error reading json items. There is no data?`, error)
       process.exit(2)
     }
 
-    const icon = meta && meta.icon ? meta.icon :
-      iconLists.iconsList[utils.generateRandom(iconLists.iconsList.length, this.props.serviceName)]
-
-    const fields = thekeys.map(e => {
-      return {
-        field: e,
-        fieldTitle: meta && meta.titles && meta.titles[e] ? meta.titles[e] : changeTitleCase.titleCase(e)
-      }
-    })
-
-
     const serviceNameTitleCase = changeTitleCase.titleCase(this.props.serviceName)
     const serviceNamePascalCase = changeCase.pascalCase(this.props.serviceName)
+    const serviceNameCamelCase = changeCase.camelCase(this.props.serviceName)
+
+    const icon = meta?.icon ? meta?.icon : iconLists.iconsList[utils.generateRandom(iconLists.iconsList.length, this.props.serviceName)]
 
     const templateData = {
       serviceName: this.props.serviceName,
@@ -158,11 +152,11 @@ module.exports = class extends Generator {
       icon: icon,
       serviceNameTitleCase,
       serviceNamePascalCase,
+      serviceNameCamelCase,
       thejson,
       meta,
       title: meta?.main_title ? meta.main_title : serviceNameTitleCase,
       changeCase,
-      thekeys,
       listFields: fields.filter(e => {
         return !meta?.no_list?.includes(e.field)
       }),
@@ -216,7 +210,7 @@ module.exports = class extends Generator {
 
     modifyDestFile('src/layouts/MainLayout.vue', (mainLayoutJs) => {
       // check MainLayout.vue content to avoid duplicate entries
-      if (utils.wordInText(templateData.serviceNamePascalCase, mainLayoutJs)) {
+      if (utils.wordInText(templateData.title, mainLayoutJs)) {
         return
       }
 
@@ -261,7 +255,7 @@ module.exports = class extends Generator {
     })
 
     modifyDestFile('quasar.config.js', (quasarConf) => {
-      // check routes.js content to avoid duplicate entries
+      // check quasar.config.js content to avoid duplicate entries
       if (utils.wordInText('global-components', quasarConf)) {
         return
       }

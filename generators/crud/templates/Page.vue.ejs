@@ -1,6 +1,4 @@
 <%_
-  let collection = serviceName;
-  let firstItem = isPaginated ? thejson[itemsName][0] : thejson[0];
   let firstField = editFields[0];
 _%>
 <template lang="pug">
@@ -34,8 +32,13 @@ q-page(padding)
                     <%= rel.originModelSnakeCase %>-select(v-model="<%= serviceName %>.<%= rel.dependent_attr %>")
 
                       <%_ } else { -%>
-                    q-input(v-model="<%= serviceName %>.<%= e.field %>" label="<%= e.fieldTitle %> *"<% if(index === 0) { %> autofocus<% } %>)
+                        <%_ if (e.fieldType === 'boolean') { -%>
+                    q-checkbox(v-model="<%= serviceNameCamelCase %>.<%= e.field %>" label="<%= e.fieldTitle %> *"<% if(index === 0) { %> autofocus<% } %>)
                       template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
+                        <%_ } else { -%>
+                    q-input(v-model="<%= serviceNameCamelCase %>.<%= e.field %>" label="<%= e.fieldTitle %> *"<% if(index === 0) { %> autofocus<% } %>)
+                      template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
+                        <%_ }-%>
 
                       <%_ }-%>
                     <%_ }) -%>
@@ -58,10 +61,14 @@ q-page(padding)
               .text-h6 <%= e.fieldTitle %>
               <%_ if(relations && relations[e.field]) { -%>
                 <%_ const rel = relations[e.field] -%>
-              p {{<%= serviceName %>.<%= e.field %>?.<%= rel.label_attr %>}}
+              p {{<%= serviceNameCamelCase %>.<%= e.field %>?.<%= rel.label_attr %>}}
 
               <%_ } else { -%>
-              p {{<%= serviceName %>.<%= e.field %>}}
+                <%_ if (e.fieldType === 'boolean') { -%>
+              p {{<%= serviceNameCamelCase %>.<%= e.field %> ? 'Si' : 'No'}}
+                <%_ } else { -%>
+              p {{<%= serviceNameCamelCase %>.<%= e.field %>}}
+                <%_ }-%>
 
               <%_ }-%>
             <%_ }) -%>
@@ -103,7 +110,12 @@ const columns = [
     label: '<%= e.fieldTitle %>',
     align: 'left',
     field: '<%= e.field %>',
+<%_ if (e.fieldType) { -%>
+    sortable: true,
+    type: '<%= e.fieldType %>'
+<%_ } else { -%>
     sortable: true
+<%_ }-%>
   },
   <%_ }-%>
 <%_ }) -%>
@@ -152,10 +164,10 @@ export default {
       rowsPerPage: 10,
       rowsNumber: 0
     })
-    const <%= serviceName %> = ref(clear<%= serviceNamePascalCase %>())
+    const <%= serviceNameCamelCase %> = ref(clear<%= serviceNamePascalCase %>())
 
     const new<%= serviceNamePascalCase %> = () => {
-      <%= serviceName %>.value = clear<%= serviceNamePascalCase %>()
+      <%= serviceNameCamelCase %>.value = clear<%= serviceNamePascalCase %>()
       view.value = 'new'
     }
 
@@ -166,12 +178,12 @@ export default {
   <%_   const rel = relations[rn] -%>
       instance.<%= rel.dependent_attr %> = instance.<%= rel.originModel %>?.<%= rel.origin_attr %>
   <%_ } -%>
-      <%= serviceName %>.value = instance
+      <%= serviceNameCamelCase %>.value = instance
       view.value = 'edit'
     }
 
     const view<%= serviceNamePascalCase %> = async (instance) => {
-      <%= serviceName %>.value = instance
+      <%= serviceNameCamelCase %>.value = instance
       view.value = 'view'
     }
 
@@ -222,10 +234,10 @@ export default {
       try {
         let message
         if (view.value === 'new') {
-          await api.post('/<%= serviceName %>', <%= serviceName %>.value)
+          await api.post('/<%= serviceName %>', <%= serviceNameCamelCase %>.value)
           message = '<%= title %> agregado correctamente'
         } else {
-          await api.put(`/<%= serviceName %>/${<%= serviceName %>.value.id}`, <%= serviceName %>.value)
+          await api.put(`/<%= serviceName %>/${<%= serviceNameCamelCase %>.value.id}`, <%= serviceNameCamelCase %>.value)
           message = '<%= title %> editado correctamente'
         }
 
@@ -259,7 +271,7 @@ export default {
       view,
       columns,
       rows,
-      <%= serviceName %>,
+      <%= serviceNameCamelCase %>,
       loading,
       pagination,
       new<%= serviceNamePascalCase %>,

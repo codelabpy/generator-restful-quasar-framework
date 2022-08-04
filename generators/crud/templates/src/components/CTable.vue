@@ -37,6 +37,7 @@ q-table(
             q-tooltip Edit
           q-btn(@click="viewClicked(props.row)" color="positive" icon="remove_red_eye" round flat dense)
             q-tooltip Visualizar
+        template(v-else-if="col.type === 'boolean'") {{ col.value ? 'Si' : 'No' }}
         template(v-else) {{ col.value }}
   template(v-slot:no-data="{ icon, message, filter }")
     .full-width.row.flex-center.q-gutter-sm
