@@ -29,7 +29,7 @@ q-page(padding)
                   <%_ editFields.forEach((e, index) => { -%>
                       <%_ if(relations && relations[e.field]) { -%>
                         <%_ const rel = relations[e.field] -%>
-                    <%= rel.originModelSnakeCase %>-select(v-model="<%= serviceName %>.<%= rel.dependent_attr %>")
+                    <%= rel.originModelSnakeCase %>-select(v-model="<%= serviceName %>.<%= rel.dependent_attr %>" label="<%= e.fieldTitle %> *"<% if(index === 0) { %> autofocus<% } %>)
 
                       <%_ } else { -%>
                         <%_ if (e.fieldType === 'boolean') { -%>
@@ -85,9 +85,13 @@ q-page(padding)
 import { useQuasar } from 'quasar'
 import { onMounted, ref } from 'vue'
 import { api } from 'boot/axios'
+<%_ var importedComponents = [] -%>
 <%_ for (let rn in relations) { -%>
 <%_   const rel = relations[rn] -%>
+ <%_ if(!importedComponents.includes(rel.originModelPascalCase)) { -%>
 import <%= rel.originModelPascalCase %>Select from '../components/<%= rel.originModelSnakeCase %>/<%= rel.originModelPascalCase %>Select.vue'
+    <%_ importedComponents.push(rel.originModelPascalCase) -%>
+  <%_ } -%>
 <%_ } -%>
 
 // for date values ==> field: row => date.formatDate(row.fecha_alta, 'YYYY-MM-DD'),
@@ -142,10 +146,9 @@ export default {
   name: '<%= serviceNamePascalCase %>Page',
 <%_ if(relations) { -%>
   components: {
-  <%_ for (let rn in relations) { -%>
-  <%_   const rel = relations[rn] -%>
-    <%= rel.originModelPascalCase %>Select
-  <%_ } -%>
+  <%_ importedComponents.forEach( (component, index) => { -%>
+    <%= component %>Select<% if (index !== importedComponents.length - 1) {%>,<%_}%>
+  <%_ }) -%>
   },
 <%_ } -%>
 
@@ -188,7 +191,9 @@ export default {
     }
 
     const cancelEdit = _ => {
-      Object.assign(instanceRef, previousValues)
+      if (instanceRef) {
+        Object.assign(instanceRef, previousValues)
+      }
       view.value = 'list'
     }
 

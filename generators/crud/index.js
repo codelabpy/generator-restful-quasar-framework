@@ -26,7 +26,7 @@ module.exports = class extends Generator {
         name: 'path',
         message:
           'Ingrese el path del servicio RESTful a construir las vistas crud',
-        default: '/entidad_financiera'
+        default: '/persona'
       },
       {
         type: 'confirm',
@@ -130,7 +130,7 @@ module.exports = class extends Generator {
       fields = Object.keys(firstElement).map(e => {
         return {
           field: e,
-          fieldTitle: meta && meta.titles && meta.titles[e] ? meta.titles[e] : changeTitleCase.titleCase(e),
+          fieldTitle: meta && meta.titles && meta.titles[e] ? meta.titles[e] : changeTitleCase.titleCase(e.replace(/_/g, ' ')),
           fieldType: typeof firstElement[e]
         }
       })
