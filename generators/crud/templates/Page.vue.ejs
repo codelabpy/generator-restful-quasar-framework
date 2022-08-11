@@ -22,31 +22,39 @@ q-page(padding)
         q-card(flat bordered v-bind:style="{'width': '60%'}")
           q-card-section
 
-            q-form(@submit="onSubmit" class="q-gutter-md" color="positive")
+            q-form.q-gutter-md(@submit='onSubmit' color='positive')
               .q-pa-md
                 .q-gutter-md.row
                   .col
                   <%_ editFields.forEach((e, index) => { -%>
                       <%_ if(relations && relations[e.field]) { -%>
                         <%_ const rel = relations[e.field] -%>
-                    <%= rel.originModelSnakeCase %>-select(v-model="<%= serviceName %>.<%= rel.dependent_attr %>" label="<%= e.fieldTitle %> *"<% if(index === 0) { %> autofocus<% } %>)
-
-                      <%_ } else { -%>
-                        <%_ if (e.fieldType === 'boolean') { -%>
-                    q-checkbox(v-model="<%= serviceNameCamelCase %>.<%= e.field %>" label="<%= e.fieldTitle %> *"<% if(index === 0) { %> autofocus<% } %>)
+                    <%= rel.originModelSnakeCase %>-select(v-model='<%= serviceName %>.<%= rel.dependent_attr %>' label='<%= e.fieldTitle %>'<% if(index === 0) { %> autofocus<% } %>)
+                      <%_ } else { 
+                          switch (e.fieldType) { 
+                              case 'date': -%>
+                    c-date(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>')
+                              <%_ break
+                              case 'boolean': -%>
+                    q-checkbox(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>'<% if(index === 0) { %> autofocus<% } %>)
                       template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
-                        <%_ } else { -%>
-                    q-input(v-model="<%= serviceNameCamelCase %>.<%= e.field %>" label="<%= e.fieldTitle %> *"<% if(index === 0) { %> autofocus<% } %>)
+                              <%_ break
+                              case 'number': -%>
+                    q-input(v-model.number='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' type='number' <% if(index === 0) { %> autofocus<% } %>)
                       template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
-                        <%_ }-%>
+                              <%_ break
+                              default: -%>
+                    q-input(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>'<% if(index === 0) { %> autofocus<% } %>)
+                      template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
+                        <%_ }
+                          }-%>
 
-                      <%_ }-%>
                     <%_ }) -%>
           q-separator
 
-          q-card-actions(align="around")
-            q-btn(@click="cancelEdit" flat) Volver
-            q-btn(flat color="positive" @click.prevent="onSubmit" :loading="loading") Grabar
+          q-card-actions(align='around')
+            q-btn(@click='cancelEdit' flat) Volver
+            q-btn(flat color='positive' @click.prevent='onSubmit' :loading='loading') Grabar
 
   // Vista de visualización
   section(v-if="view === 'view'")

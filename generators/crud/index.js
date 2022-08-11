@@ -125,13 +125,19 @@ module.exports = class extends Generator {
     let firstElement
     let fields
 
+    const getFieldType = (e) => { 
+      if(meta?.date_fields && meta.date_fields.includes(e)) return 'date' 
+      if(meta?.currency_fields && meta.currency_fields.includes(e)) return 'currency' 
+      return typeof firstElement[e]
+    }
+
     try {
       firstElement = (this.props.isPaginated ? thejson[this.props.itemsName] : thejson)[0]
       fields = Object.keys(firstElement).map(e => {
         return {
           field: e,
-          fieldTitle: meta && meta.titles && meta.titles[e] ? meta.titles[e] : changeTitleCase.titleCase(e.replace(/_/g, ' ')),
-          fieldType: typeof firstElement[e]
+          fieldTitle: meta?.titles && meta.titles[e] ? meta.titles[e] : changeTitleCase.titleCase(e.replace(/_/g, ' ')),
+          fieldType: getFieldType(e)
         }
       })
     } catch (error) {
@@ -149,7 +155,7 @@ module.exports = class extends Generator {
       serviceName: this.props.serviceName,
       isPaginated: this.props.isPaginated,
       itemsName: this.props.itemsName,
-      icon: icon,
+      icon,
       serviceNameTitleCase,
       serviceNamePascalCase,
       serviceNameCamelCase,
