@@ -55,6 +55,8 @@ q-page(padding)
           q-card-actions(align='around')
             q-btn(@click='cancelEdit' flat) Volver
             q-btn(flat color='positive' @click.prevent='onSubmit' :loading='loading') Grabar
+            q-space(v-if="view === 'edit'")
+            q-btn(v-if="view === 'edit'" @click.prevent="onDelete" flat color="negative" :loading="loading") Borrar
 
   // Vista de visualización
   section(v-if="view === 'view'")
@@ -187,7 +189,7 @@ export default {
       previousValues = { ...instance }
   <%_ for (let rn in relations) { -%>
   <%_   const rel = relations[rn] -%>
-      instance.<%= rel.dependent_attr %> = instance.<%= rel.originModel %>?.<%= rel.origin_attr %>
+      instance.<%= rel.dependent_attr %> = instance.<%= rn %>?.<%= rel.origin_attr %>
   <%_ } -%>
       <%= serviceNameCamelCase %>.value = instance
       view.value = 'edit'
@@ -241,9 +243,17 @@ export default {
       }
     }
 
+    const goToList = _ => {
+      // Se redirecciona a la lista
+      view.value = 'list'
+      onRequest({
+        pagination: pagination.value,
+        filter: undefined
+      })
+    }
+
     const onSubmit = async () => {
       loading.value = true
-
       try {
         let message
         if (view.value === 'new') {
@@ -253,15 +263,8 @@ export default {
           await api.put(`/<%= serviceName %>/${<%= serviceNameCamelCase %>.value.id}`, <%= serviceNameCamelCase %>.value)
           message = '<%= title %> editado correctamente'
         }
-
         $q.notify({ type: 'positive', message })
-
-        // Se redirecciona a la lista
-        view.value = 'list'
-        onRequest({
-          pagination: pagination.value,
-          filter: undefined
-        })
+        goToList()
       } catch (error) {
         console.log(error)
         $q.notify({
@@ -271,6 +274,30 @@ export default {
       } finally {
         loading.value = false
       }
+    }
+
+    const onDelete = async () => {
+      $q.dialog({
+        title: 'Confirmar',
+        message: '¿Desea borrar la <%= title  %>?',
+        cancel: true,
+        persistent: true
+      }).onOk(async _ => {
+        loading.value = true
+        try {
+          await api.delete(`/<%= serviceName %>/${<%= serviceNameCamelCase %>.value.id}`)
+          $q.notify({ type: 'positive', message: '<%= title %> borrada correctamente' })
+          goToList()
+        } catch (error) {
+          console.log(error)
+          $q.notify({
+            type: 'warning',
+            message: 'Ocurrió un error al borrar <%= title %>'
+          })
+        } finally {
+          loading.value = false
+        }
+      })
     }
 
     onMounted(async () => {
@@ -292,7 +319,8 @@ export default {
       view<%= serviceNamePascalCase %>,
       cancelEdit,
       onSubmit,
-      onRequest
+      onRequest,
+      onDelete
     }
   }
 }
