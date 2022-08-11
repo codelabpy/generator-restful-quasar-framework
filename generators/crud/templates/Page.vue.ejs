@@ -181,7 +181,7 @@ export default {
       previousValues = { ...instance }
   <%_ for (let rn in relations) { -%>
   <%_   const rel = relations[rn] -%>
-      instance.<%= rel.dependent_attr %> = instance.<%= rel.originModel %>?.<%= rel.origin_attr %>
+      instance.<%= rel.dependent_attr %> = instance.<%= rn %>?.<%= rel.origin_attr %>
   <%_ } -%>
       <%= serviceNameCamelCase %>.value = instance
       view.value = 'edit'
