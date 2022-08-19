@@ -182,6 +182,7 @@ module.exports = class extends Generator {
       rel.originModel = rel.origin_model
       rel.originModelTitleCase = changeTitleCase.titleCase(rel.origin_model)
       rel.originModelPascalCase = changeCase.pascalCase(rel.origin_model)
+      rel.originModelCamelCase = changeCase.camelCase(rel.origin_model)
       rel.originModelSnakeCase = changeCase.snakeCase(rel.origin_model)
       // process and create specific component
       this.fs.copyTpl(

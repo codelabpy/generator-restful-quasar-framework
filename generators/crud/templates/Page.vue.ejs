@@ -29,7 +29,7 @@ q-page(padding)
                   <%_ editFields.forEach((e, index) => { -%>
                       <%_ if(relations && relations[e.field]) { -%>
                         <%_ const rel = relations[e.field] -%>
-                    <%= rel.originModelSnakeCase %>-select(v-model='<%= serviceName %>.<%= rel.dependent_attr %>' label='<%= e.fieldTitle %>'<% if(index === 0) { %> autofocus<% } %>)
+                    <%= rel.originModelSnakeCase %>-select(v-model='<%= serviceNameCamelCase %>.<%= rel.dependent_attr %>' label='<%= e.fieldTitle %>'<% if(index === 0) { %> autofocus<% } %>)
                       <%_ } else { 
                           switch (e.fieldType) { 
                               case 'date': -%>
