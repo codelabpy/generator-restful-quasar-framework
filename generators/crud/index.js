@@ -137,6 +137,7 @@ module.exports = class extends Generator {
         return {
           field: e,
           fieldTitle: meta?.titles && meta.titles[e] ? meta.titles[e] : changeTitleCase.titleCase(e.replace(/_/g, ' ')),
+          required: meta?.required && meta.required.includes(e) ? true : false,
           fieldType: getFieldType(e)
         }
       })
@@ -171,8 +172,6 @@ module.exports = class extends Generator {
       }),
       relations: meta?.relations
     }
-
-    this.log(templateData)
 
     // Process simple relations (ensure this is processed first in order to get
     // relationship info on other templates)

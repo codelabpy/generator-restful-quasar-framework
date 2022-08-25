@@ -44,8 +44,7 @@ q-page(padding)
                       template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
                               <%_ break
                               default: -%>
-                    q-input(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>'<% if(index === 0) { %> autofocus<% } %>)
-                      template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
+                    c-input(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' hint='Ingrese el <%= e.fieldTitle %>'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
                         <%_ }
                           }-%>
 
