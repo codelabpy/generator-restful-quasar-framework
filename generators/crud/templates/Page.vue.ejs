@@ -29,19 +29,18 @@ q-page(padding)
                   <%_ editFields.forEach((e, index) => { -%>
                       <%_ if(relations && relations[e.field]) { -%>
                         <%_ const rel = relations[e.field] -%>
-                    <%= rel.originModelSnakeCase %>-select(v-model='<%= serviceNameCamelCase %>.<%= rel.dependent_attr %>' label='<%= e.fieldTitle %>'<% if(index === 0) { %> autofocus<% } %>)
+                    <%= rel.originModelSnakeCase %>-select(v-model='<%= serviceNameCamelCase %>.<%= rel.dependent_attr %>' label='<%= e.fieldTitle %>'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
                       <%_ } else { 
                           switch (e.fieldType) { 
                               case 'date': -%>
-                    c-date(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>')
+                    c-date(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>'<% if(e.required) { %> required<% } %>)
                               <%_ break
                               case 'boolean': -%>
-                    q-checkbox(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>'<% if(index === 0) { %> autofocus<% } %>)
+                    q-checkbox(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
                       template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
                               <%_ break
                               case 'number': -%>
-                    q-input(v-model.number='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' type='number' <% if(index === 0) { %> autofocus<% } %>)
-                      template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
+                    c-input(v-model.number='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' hint='Ingrese el <%= e.fieldTitle %>' type='number'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
                               <%_ break
                               default: -%>
                     c-input(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' hint='Ingrese el <%= e.fieldTitle %>'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)

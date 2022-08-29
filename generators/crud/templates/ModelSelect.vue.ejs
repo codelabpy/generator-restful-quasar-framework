@@ -1,8 +1,8 @@
 <template lang="pug">
 //-
-  pais-select: Componente reutilizable para seleccionar <%= originModel  %>
+  <%= originModelSnakeCase  %>-select: Componente reutilizable para seleccionar <%= originModel  %>
 
-c-select(path="/<%= originModelSnakeCase %>" label="Seleccione un <%= originModelTitleCase %> *"
+c-select(path="/<%= originModelSnakeCase %>" label="Seleccione un <%= originModelTitleCase %>"
   option-value="<%= origin_attr %>" option-label="<%= label_attr %>" emit-value map-options)
 
 </template>

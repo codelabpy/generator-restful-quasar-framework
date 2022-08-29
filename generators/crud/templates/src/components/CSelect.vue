@@ -5,7 +5,7 @@
   Author: Pedro Flores
   Fecha: 2022-07-22
 
-q-select(:options="csoptions")
+q-select(:options="csoptions" :label='label ? `${label}${required ? " *" : ""}` : null' :rules='validationRules')
 
 </template>
 
@@ -14,6 +14,18 @@ import { ref, onMounted } from 'vue'
 import { api } from 'boot/axios'
 
 const props = defineProps({
+  hint: {
+    type: String,
+    default: 'Ingrese un valor'
+  },
+  label: {
+    type: String,
+    default: null
+  },
+  required: {
+    type: Boolean,
+    default: null
+  },
   path: {
     type: String,
     default: null
@@ -32,4 +44,10 @@ onMounted(async _ => {
     }
   }
 })
+
+// TODO: Delete this comment when vue-eslint-parser is >= v9.0.0
+// eslint-disable-next-line no-unused-vars
+const validationRules = [
+  val => !(props.required && !val) || 'Campo requerido'
+]
 </script>
