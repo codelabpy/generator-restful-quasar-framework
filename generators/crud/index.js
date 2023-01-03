@@ -220,8 +220,9 @@ module.exports = class extends Generator {
         return
       }
 
-      const pattern = `    route: '/'\n  },`
-      const menuLinksIndex = mainLayoutJs.indexOf(pattern)
+      var pattern = `    route: '/'\n  }`
+      var menuLinksIndex = mainLayoutJs.indexOf(pattern)
+      let hasMoreLinks = mainLayoutJs.indexOf(`${pattern},`) !== -1
 
       if (menuLinksIndex === -1) {
         throw new Error('No definition found in MenuLinks')
@@ -232,7 +233,7 @@ module.exports = class extends Generator {
       let jsonMenuLink = this.fs.read(this.templatePath("json_menu_link.ejs"));
 
       return ejs.render(
-        before + jsonMenuLink + after,
+        before + `,${jsonMenuLink.slice(0, -1)}${hasMoreLinks ? ',' : ''}` + after,
         templateData
       )
     })
@@ -255,7 +256,7 @@ module.exports = class extends Generator {
       let jsonRoute = this.fs.read(this.templatePath("json_route_router.ejs"));
 
       return ejs.render(
-        before + `${jsonRoute.slice(0, -1)}${hasMoreRoutes ? ',\n' : '\n'}` + after,
+        before + `${jsonRoute.slice(0, -1)}${hasMoreRoutes ? ',\n' : '\n '}` + after,
         templateData
       )
     })

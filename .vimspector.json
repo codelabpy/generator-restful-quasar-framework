@@ -9,7 +9,7 @@
         "console": "integratedTerminal",
         "program": "~/APPS/DESARROLLO/NODE/node-v14.19.3-linux-x64/bin/yo",
         "args": "restful-quasar-framework",
-        "cwd": "/sdd1/PROJECTS/AVALON/REINGENIERIA/avalon-frontend"
+        "cwd": "~/PROJECTS/CODELAB/CCAN/arasy-frontend"
       }
     },
     "crud": {
@@ -21,7 +21,7 @@
         "console": "integratedTerminal",
         "program": "~/APPS/DESARROLLO/NODE/node-v14.19.3-linux-x64/bin/yo",
         "args": "restful-quasar-framework:crud",
-        "cwd": "/sdd1/PROJECTS/AVALON/REINGENIERIA/avalon-frontend"
+        "cwd": "~/PROJECTS/CODELAB/CCAN/arasy-frontend"
       }
     }
   }
