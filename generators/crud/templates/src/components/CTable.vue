@@ -13,7 +13,7 @@ q-table(
   no-data-label="No hay datos"
   no-results-label="El filtro no encontró resultados"
   :loading="loading"
-  :loading-label="'Cargando...'"
+  :loading-label="$t('ctable_loading')"
   v-model:pagination="pagination"
   :filter="filter"
 )
@@ -23,20 +23,20 @@ q-table(
       .q-pl-md.q-table__title {{ title }}
   template(v-slot:top-right)
     .col-9
-      q-input(borderless dense debounce="300" v-model="filter" :placeholder="$t('general_search')" filled color="positive" )
+      q-input(borderless dense debounce="300" v-model="filter" :placeholder="$t('ctable_search')" filled color="positive" )
         template(v-slot:append)
           q-icon(name="search")
     .row.col-3
       q-btn(@click="$emit('add')" color="positive" icon="add" round flat)
-        q-tooltip $t('general_new')
+        q-tooltip {{ $t('general_new') }}
   template(v-slot:body="props")
     q-tr(:props="props")
       q-td(v-for="col in props.cols" :key="col.name" :props="props")
         template(v-if="col.name === 'action'")
           q-btn(@click="editClicked(props.row)" color="positive" icon="edit" round flat dense)
-            q-tooltip $t('general_edit')
+            q-tooltip {{ $t('general_edit') }}
           q-btn(@click="viewClicked(props.row)" color="positive" icon="remove_red_eye" round flat dense)
-            q-tooltip Visualizar
+            q-tooltip {{ $t('general_view') }}
         template(v-else-if="col.type === 'boolean'") {{ col.value ? 'Si' : 'No' }}
         template(v-else) {{ col.value }}
   template(v-slot:no-data="{ icon, message, filter }")

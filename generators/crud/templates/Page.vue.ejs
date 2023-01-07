@@ -15,7 +15,7 @@ q-page(padding)
     q-card
       q-card-section
         .text-h6 {{ view === 'edit' ? $t('general_edit') : $t('general_new') }} {{ $t('<%= serviceName %>_title') }}
-        .text-subtitle2 $('general_complete_the_data')
+        .text-subtitle2 {{ $t('general_complete_the_data') }}
       q-separator
 
       q-card-section.flex.flex-center
@@ -51,16 +51,16 @@ q-page(padding)
           q-separator
 
           q-card-actions(align='around')
-            q-btn(@click='cancelEdit' flat) Volver
-            q-btn(flat color='positive' @click.prevent='onSubmit' :loading='loading') Grabar
+            q-btn(@click='cancelEdit' flat) {{ $t('general_back') }}
+            q-btn(flat color='positive' @click.prevent='onSubmit' :loading='loading') {{ $t('general_save') }}
             q-space(v-if="view === 'edit'")
-            q-btn(v-if="view === 'edit'" @click.prevent="onDelete" flat color="negative" :loading="loading") Borrar
+            q-btn(v-if="view === 'edit'" @click.prevent="onDelete" flat color="negative" :loading="loading")  {{ $t('general_delete') }}
 
   // Vista de visualización
   section(v-if="view === 'view'")
     q-card
       q-card-section
-        .text-h6 Visualizar <%= title %>
+        .text-h6 {{ $t('general_view') }} <%= title %>
 
         .q-pa-md
           .q-gutter-md.row
@@ -83,7 +83,7 @@ q-page(padding)
       q-separator
 
       q-card-actions(align="around")
-        q-btn(@click="view = 'list'" flat) Volver
+        q-btn(@click="view = 'list'" flat) {{ $t('general_back') }}
         //q-btn(flat color="positive") Aceptar
 
 </template>
@@ -269,7 +269,7 @@ export default {
         console.log(error)
         $q.notify({
           type: 'warning',
-          message: 'Ocurrió un error al grabar el <%= title %>'
+          message: $t('page_save_error_message', { entity: '<%= title %>' })
         })
       } finally {
         loading.value = false
@@ -278,21 +278,21 @@ export default {
 
     const onDelete = async () => {
       $q.dialog({
-        title: 'Confirmar',
-        message: '¿Desea borrar la <%= title  %>?',
+        title: $t('page_delete_dialog_title'),
+        message: $t('page_delete_dialog_message', { entity: '<%= title %>' }),
         cancel: true,
         persistent: true
       }).onOk(async _ => {
         loading.value = true
         try {
           await api.delete(`/<%= serviceName %>/${<%= serviceNameCamelCase %>.value.id}`)
-          $q.notify({ type: 'positive', message: '<%= title %> borrada correctamente' })
+          $q.notify({ type: 'positive', message: $t('page_delete_notify_message', { entity: '<%= title %>' }) })
           goToList()
         } catch (error) {
           console.log(error)
           $q.notify({
             type: 'warning',
-            message: 'Ocurrió un error al borrar <%= title %>'
+            message: $t('page_delete_notify_error_message', { entity: '<%= title %>' })
           })
         } finally {
           loading.value = false
