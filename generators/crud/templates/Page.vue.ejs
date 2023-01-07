@@ -7,15 +7,15 @@ q-page(padding)
   // List
   section(v-if="view === 'list'")
     .q-pa-md
-      c-table(icon="<%= icon %>" title="<%= title %>" :rows="rows" :columns="columns" :loading="loading"
+      c-table(icon="<%= icon %>" :title="$t('<%= serviceName %>_title')" :rows="rows" :columns="columns" :loading="loading"
         @request="onRequest" @add="new<%= serviceNamePascalCase %>" @edit="edit<%= serviceNamePascalCase %>" @view="view<%= serviceNamePascalCase %>")
 
   // Edit
   section(v-if="view === 'new' || view === 'edit'")
     q-card
       q-card-section
-        .text-h6 {{ view === 'edit' ? 'Editar' : 'Nuevo' }} <%= title %>
-        .text-subtitle2 Complete los datos solicitados
+        .text-h6 {{ view === 'edit' ? $t('general_edit') : $t('general_new') }} {{ $t('<%= serviceName %>_title') }}
+        .text-subtitle2 $('general_complete_the_data')
       q-separator
 
       q-card-section.flex.flex-center
@@ -92,6 +92,7 @@ q-page(padding)
 import { useQuasar } from 'quasar'
 import { onMounted, ref } from 'vue'
 import { api } from 'boot/axios'
+import { i18n } from 'boot/i18n.js'
 <%_ var importedComponents = [] -%>
 <%_ for (let rn in relations) { -%>
 <%_   const rel = relations[rn] -%>
@@ -100,6 +101,8 @@ import <%= rel.originModelPascalCase %>Select from '../components/<%= rel.origin
     <%_ importedComponents.push(rel.originModelPascalCase) -%>
   <%_ } -%>
 <%_ } -%>
+
+const $t = i18n.global.t
 
 // for date values ==> field: row => date.formatDate(row.fecha_alta, 'YYYY-MM-DD'),
 // for transitive values ==> field: row => row.tipo_documento?.valor,
@@ -133,7 +136,7 @@ const columns = [
   {
     name: 'action',
     align: 'center',
-    label: 'Acciones',
+    label: $t('general_actions'),
     field: 'action'
   }
 ]

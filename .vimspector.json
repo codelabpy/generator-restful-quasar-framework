@@ -7,9 +7,9 @@
         "protocol": "auto",
         "stopOnEntry": false,
         "console": "integratedTerminal",
-        "program": "~/APPS/DESARROLLO/NODE/node-v14.19.3-linux-x64/bin/yo",
+        "program": "~/APPS/DESARROLLO/NODE/node-v16.18.0-linux-x64/bin/yo",
         "args": "restful-quasar-framework",
-        "cwd": "~/PROJECTS/CODELAB/CCAN/arasy-frontend"
+        "cwd": "~/PROJECTS/CODELAB/CCAN/ARASY/arasy-frontend"
       }
     },
     "crud": {
@@ -19,9 +19,9 @@
         "protocol": "auto",
         "stopOnEntry": false,
         "console": "integratedTerminal",
-        "program": "~/APPS/DESARROLLO/NODE/node-v14.19.3-linux-x64/bin/yo",
+        "program": "~/APPS/DESARROLLO/NODE/node-v16.18.0-linux-x64/bin/yo",
         "args": "restful-quasar-framework:crud",
-        "cwd": "~/PROJECTS/CODELAB/CCAN/arasy-frontend"
+        "cwd": "~/PROJECTS/CODELAB/CCAN/ARASY/arasy-frontend"
       }
     }
   }

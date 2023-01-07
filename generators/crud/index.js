@@ -26,7 +26,7 @@ module.exports = class extends Generator {
         name: 'path',
         message:
           'Ingrese el path del servicio RESTful a construir las vistas crud',
-        default: '/persona'
+        default: '/hospital'
       },
       {
         type: 'confirm',
@@ -164,6 +164,7 @@ module.exports = class extends Generator {
       meta,
       title: meta?.main_title ? meta.main_title : serviceNameTitleCase,
       changeCase,
+      fields,
       listFields: fields.filter(e => {
         return !meta?.no_list?.includes(e.field)
       }),
@@ -279,6 +280,22 @@ module.exports = class extends Generator {
 
       return ejs.render(
         before + `,\n      'global-components'${hasMore ? ',' : ''}\n` + after,
+        templateData
+      )
+    })
+
+    modifyDestFile('src/i18n/en-US/index.js', (langIndexJS) => {
+      let endIndex = langIndexJS.indexOf('\n}')
+      let general_messages = ''
+      if (!langIndexJS.includes('general_complete_the_data')) {
+        general_messages = this.fs.read(this.templatePath("general_messages.ejs"));
+      }
+      let messages = this.fs.read(this.templatePath("messages.ejs"));
+
+      let before = langIndexJS.substring(0, endIndex)
+
+      return ejs.render(
+        before + ',\n' + general_messages + messages,
         templateData
       )
     })

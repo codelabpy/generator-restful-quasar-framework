@@ -23,18 +23,18 @@ q-table(
       .q-pl-md.q-table__title {{ title }}
   template(v-slot:top-right)
     .col-9
-      q-input(borderless dense debounce="300" v-model="filter" placeholder="Buscar" filled color="positive" )
+      q-input(borderless dense debounce="300" v-model="filter" :placeholder="$t('general_search')" filled color="positive" )
         template(v-slot:append)
           q-icon(name="search")
     .row.col-3
       q-btn(@click="$emit('add')" color="positive" icon="add" round flat)
-        q-tooltip Nuevo
+        q-tooltip $t('general_new')
   template(v-slot:body="props")
     q-tr(:props="props")
       q-td(v-for="col in props.cols" :key="col.name" :props="props")
         template(v-if="col.name === 'action'")
           q-btn(@click="editClicked(props.row)" color="positive" icon="edit" round flat dense)
-            q-tooltip Edit
+            q-tooltip $t('general_edit')
           q-btn(@click="viewClicked(props.row)" color="positive" icon="remove_red_eye" round flat dense)
             q-tooltip Visualizar
         template(v-else-if="col.type === 'boolean'") {{ col.value ? 'Si' : 'No' }}
