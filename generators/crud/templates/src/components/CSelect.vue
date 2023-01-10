@@ -49,6 +49,6 @@ onMounted(async _ => {
 // TODO: Delete this comment when vue-eslint-parser is >= v9.0.0
 // eslint-disable-next-line no-unused-vars
 const validationRules = [
-  val => !(props.required && !val) || i18n.global.t('cinput_validation_required'),
+  val => !(props.required && !val) || i18n.global.t('cinput_validation_required')
 ]
 </script>
