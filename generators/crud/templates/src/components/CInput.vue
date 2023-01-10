@@ -14,13 +14,12 @@ q-input(
 </template>
 
 <script setup>
-import { useI18n } from "vue-i18n";
-const { t } = useI18n();
+import { i18n } from 'boot/i18n'
 
 const props = defineProps({
   hint: {
     type: String,
-    default: t('cinput_hint')
+    default: () => i18n.global.t('cinput_hint')
   },
   label: {
     type: String,
@@ -42,7 +41,7 @@ const props = defineProps({
 // TODO: Delete this comment when vue-eslint-parser is >= v9.0.0
 // eslint-disable-next-line no-unused-vars
 const validationRules = [
-  val => !(props.required && !val) || t('cinput_validation_required'),
+  val => !(props.required && !val) || i18n.global.t('cinput_validation_required'),
   val => !(props.minLength && val && typeof val === 'string' && val.length < props.minLength) || `Cantidad de caracteres no puede ser menor a ${props.minLength}`
 ]
 </script>

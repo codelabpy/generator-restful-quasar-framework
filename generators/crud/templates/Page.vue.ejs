@@ -37,13 +37,13 @@ q-page(padding)
                               <%_ break
                               case 'boolean': -%>
                     q-checkbox(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
-                      template(v-slot:hint) Ingrese el <%= e.fieldTitle %>
+                      template(v-slot:hint) {{ $t('page_field_hint', { entity: '<%= e.field %>' }) }}
                               <%_ break
                               case 'number': -%>
-                    c-input(v-model.number='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' hint='Ingrese el <%= e.fieldTitle %>' type='number'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
+                    c-input(v-model.number='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' :hint="$t('page_field_hint', { entity: '<%= e.field %>' })" type='number'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
                               <%_ break
                               default: -%>
-                    c-input(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' hint='Ingrese el <%= e.fieldTitle %>'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
+                    c-input(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' :hint="$t('page_field_hint', { entity: '<%= e.field %>' })"<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
                         <%_ }
                           }-%>
 

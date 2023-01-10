@@ -12,11 +12,12 @@ q-select(:options="csoptions" :label='label ? `${label}${required ? " *" : ""}` 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { api } from 'boot/axios'
+import { i18n } from 'boot/i18n'
 
 const props = defineProps({
   hint: {
     type: String,
-    default: 'Ingrese un valor'
+    default: () => i18n.global.t('cinput_hint')
   },
   label: {
     type: String,
@@ -48,6 +49,6 @@ onMounted(async _ => {
 // TODO: Delete this comment when vue-eslint-parser is >= v9.0.0
 // eslint-disable-next-line no-unused-vars
 const validationRules = [
-  val => !(props.required && !val) || 'Campo requerido'
+  val => !(props.required && !val) || i18n.global.t('cinput_validation_required'),
 ]
 </script>
