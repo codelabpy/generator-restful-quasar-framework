@@ -290,7 +290,13 @@ module.exports = class extends Generator {
       if (!langIndexJS.includes('general_complete_the_data')) {
         general_messages = this.fs.read(this.templatePath("general_messages.ejs"));
       }
-      let messages = this.fs.read(this.templatePath("messages.ejs"));
+      let messages = ''
+      if (!langIndexJS.includes(`${templateData.serviceName}_`)) {
+        messages = this.fs.read(this.templatePath("messages.ejs"));
+      } else {
+        this.log('Entity messages appear to be already included. Refusing to touch src/i18n/en-US/index.js')
+        return
+      }
 
       let before = langIndexJS.substring(0, endIndex)
 

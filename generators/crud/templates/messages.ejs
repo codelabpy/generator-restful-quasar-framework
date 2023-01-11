@@ -1,6 +1,6 @@
-<%_ let lastField = fields[fields.length - 1] -%>
-  <%= serviceName %>_title: '<%= serviceNameTitleCase %>',
-<%_ listFields.forEach(e => { -%>
-  <%= serviceName %>_<%= e.field %>: '<%= e.fieldTitle %>'<%_ if (e.field !== lastField.field) { -%>,<%_ } -%>
-<% }) %>
+  <%= serviceName %>: '<%= title %>',
+<%_ for(let i = 0; i < listFields.length; i++) { -%>
+  <%_ let e = listFields[i] -%>
+  <%= serviceName %>_<%= e.field %>: '<%= e.fieldTitle %>'<%_ if (i !== listFields.length - 1) { -%>,<%_ } %>
+<% } -%>
 }

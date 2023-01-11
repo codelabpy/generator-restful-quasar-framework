@@ -7,54 +7,55 @@ q-page(padding)
   // List
   section(v-if="view === 'list'")
     .q-pa-md
-      c-table(icon="<%= icon %>" :title="$t('<%= serviceName %>_title')" :rows="rows" :columns="columns" :loading="loading"
+      c-table(icon="<%= icon %>" :title="$t('<%= serviceName %>')" :rows="rows" :columns="columns" :loading="loading"
         @request="onRequest" @add="new<%= serviceNamePascalCase %>" @edit="edit<%= serviceNamePascalCase %>" @view="view<%= serviceNamePascalCase %>")
 
   // Edit
   section(v-if="view === 'new' || view === 'edit'")
     q-card
       q-card-section
-        .text-h6 {{ view === 'edit' ? $t('general_edit') : $t('general_new') }} {{ $t('<%= serviceName %>_title') }}
+        .text-h6 {{ view === 'edit' ? $t('general_edit') : $t('general_new') }} {{ $t('<%= serviceName %>') }}
         .text-subtitle2 {{ $t('general_complete_the_data') }}
       q-separator
 
       q-card-section.flex.flex-center
-        q-card(flat bordered v-bind:style="{'width': '60%'}")
-          q-card-section
+        q-form(@submit='onSubmit' color='positive' :style="{'width': '60%'}")
+          q-card(flat bordered)
+            q-card-section
 
-            q-form.q-gutter-md(@submit='onSubmit' color='positive')
-              .q-pa-md
-                .q-gutter-md.row
-                  .col
-                  <%_ editFields.forEach((e, index) => { -%>
-                      <%_ if(relations && relations[e.field]) { -%>
-                        <%_ const rel = relations[e.field] -%>
-                    <%= rel.originModelSnakeCase %>-select(v-model='<%= serviceNameCamelCase %>.<%= rel.dependent_attr %>' label='<%= e.fieldTitle %>'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
-                      <%_ } else { 
-                          switch (e.fieldType) { 
-                              case 'date': -%>
-                    c-date(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>'<% if(e.required) { %> required<% } %>)
-                              <%_ break
-                              case 'boolean': -%>
-                    q-checkbox(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
-                      template(v-slot:hint) {{ $t('page_field_hint', { entity: '<%= e.field %>' }) }}
-                              <%_ break
-                              case 'number': -%>
-                    c-input(v-model.number='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' :hint="$t('page_field_hint', { entity: '<%= e.field %>' })" type='number'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
-                              <%_ break
-                              default: -%>
-                    c-input(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' :hint="$t('page_field_hint', { entity: '<%= e.field %>' })"<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
-                        <%_ }
-                          }-%>
+              .q-gutter-md
+                .q-pa-md
+                  .q-gutter-md.row
+                    .col
+                    <%_ editFields.forEach((e, index) => { -%>
+                        <%_ if(relations && relations[e.field]) { -%>
+                          <%_ const rel = relations[e.field] -%>
+                      <%= rel.originModelSnakeCase %>-select(v-model='<%= serviceNameCamelCase %>.<%= rel.dependent_attr %>' label='<%= e.fieldTitle %>'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
+                        <%_ } else { 
+                            switch (e.fieldType) { 
+                                case 'date': -%>
+                      c-date(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>'<% if(e.required) { %> required<% } %>)
+                                <%_ break
+                                case 'boolean': -%>
+                      q-checkbox(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
+                        template(v-slot:hint) {{ $t('page_field_hint', { entity: '<%= e.field %>' }) }}
+                                <%_ break
+                                case 'number': -%>
+                      c-input(v-model.number='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' :hint="$t('page_field_hint', { entity: '<%= e.field %>' })" type='number'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
+                                <%_ break
+                                default: -%>
+                      c-input(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' :hint="$t('page_field_hint', { entity: '<%= e.field %>' })"<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
+                          <%_ }
+                            }-%>
 
-                    <%_ }) -%>
-          q-separator
+                      <%_ }) -%>
+            q-separator
 
-          q-card-actions(align='around')
-            q-btn(@click='cancelEdit' flat) {{ $t('general_back') }}
-            q-btn(flat color='positive' @click.prevent='onSubmit' :loading='loading') {{ $t('general_save') }}
-            q-space(v-if="view === 'edit'")
-            q-btn(v-if="view === 'edit'" @click.prevent="onDelete" flat color="negative" :loading="loading")  {{ $t('general_delete') }}
+            q-card-actions(align='around')
+              q-btn(@click='cancelEdit' flat) {{ $t('general_back') }}
+              q-btn(type='submit' flat color='positive' :loading='loading') {{ $t('general_save') }}
+              q-space(v-if="view === 'edit'")
+              q-btn(v-if="view === 'edit'" @click.prevent="onDelete" flat color="negative" :loading="loading")  {{ $t('general_delete') }}
 
   // Vista de visualización
   section(v-if="view === 'view'")
@@ -258,10 +259,10 @@ export default {
         let message
         if (view.value === 'new') {
           await api.post('/<%= serviceName %>', <%= serviceNameCamelCase %>.value)
-          message = '<%= title %> agregado correctamente'
+          message = $t('page_added_correctly_message', { entity: '<%= title %>' })
         } else {
           await api.put(`/<%= serviceName %>/${<%= serviceNameCamelCase %>.value.id}`, <%= serviceNameCamelCase %>.value)
-          message = '<%= title %> editado correctamente'
+          message = $t('page_edited_correctly_message', { entity: '<%= title %>' })
         }
         $q.notify({ type: 'positive', message })
         goToList()
