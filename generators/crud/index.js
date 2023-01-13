@@ -217,11 +217,12 @@ module.exports = class extends Generator {
 
     modifyDestFile('src/layouts/MainLayout.vue', (mainLayoutJs) => {
       // check MainLayout.vue content to avoid duplicate entries
-      if (utils.wordInText(templateData.title, mainLayoutJs)) {
+      if (utils.wordInText(`route: '/${templateData.serviceName}'`, mainLayoutJs)) {
+        this.log('MenuLink appear to be already included. Refusing to touch src/layouts/MainLayout.vue')
         return
       }
 
-      var pattern = `    route: '/'\n  }`
+      var pattern = `          route: '/'\n        }`
       var menuLinksIndex = mainLayoutJs.indexOf(pattern)
       let hasMoreLinks = mainLayoutJs.indexOf(`${pattern},`) !== -1
 
