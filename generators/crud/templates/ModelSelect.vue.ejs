@@ -2,7 +2,7 @@
 //-
   <%= originModelSnakeCase  %>-select: Componente reutilizable para seleccionar <%= originModel  %>
 
-c-select(path="/<%= originModelSnakeCase %>" label="Seleccione un <%= originModelTitleCase %>"
+c-select(path="/<%= originModelSnakeCase %>" :label="$t('cselect_label', <%= originModelTitleCase %>)"
   option-value="<%= origin_attr %>" option-label="<%= label_attr %>" emit-value map-options)
 
 </template>

@@ -9,6 +9,8 @@ const ejs = require('ejs')
 
 const changeCase = require('change-case')
 const changeTitleCase = require('title-case')
+const pascalCaseTransformMerge = require("pascal-case").pascalCaseTransformMerge;
+const camelCaseTransformMerge = require("camel-case").camelCaseTransformMerge;
 
 module.exports = class extends Generator {
 
@@ -147,8 +149,8 @@ module.exports = class extends Generator {
     }
 
     const serviceNameTitleCase = changeTitleCase.titleCase(this.props.serviceName)
-    const serviceNamePascalCase = changeCase.pascalCase(this.props.serviceName)
-    const serviceNameCamelCase = changeCase.camelCase(this.props.serviceName)
+    const serviceNamePascalCase = changeCase.pascalCase(this.props.serviceName, { transform: pascalCaseTransformMerge })
+    const serviceNameCamelCase = changeCase.camelCase(this.props.serviceName, { transform: camelCaseTransformMerge })
 
     const icon = meta?.icon ? meta?.icon : iconLists.iconsList[utils.generateRandom(iconLists.iconsList.length, this.props.serviceName)]
 
@@ -181,8 +183,8 @@ module.exports = class extends Generator {
       // inject relationship info
       rel.originModel = rel.origin_model
       rel.originModelTitleCase = changeTitleCase.titleCase(rel.origin_model)
-      rel.originModelPascalCase = changeCase.pascalCase(rel.origin_model)
-      rel.originModelCamelCase = changeCase.camelCase(rel.origin_model)
+      rel.originModelPascalCase = changeCase.pascalCase(rel.origin_model, { transform: pascalCaseTransformMerge })
+      rel.originModelCamelCase = changeCase.camelCase(rel.origin_model, { transform: camelCaseTransformMerge })
       rel.originModelSnakeCase = changeCase.snakeCase(rel.origin_model)
       // process and create specific component
       this.fs.copyTpl(
@@ -217,7 +219,7 @@ module.exports = class extends Generator {
 
     modifyDestFile('src/layouts/MainLayout.vue', (mainLayoutJs) => {
       // check MainLayout.vue content to avoid duplicate entries
-      if (utils.wordInText(`route: '/${templateData.serviceName}'`, mainLayoutJs)) {
+      if (mainLayoutJs.includes(`route: '/${templateData.serviceName}'`)) {
         this.log('MenuLink appear to be already included. Refusing to touch src/layouts/MainLayout.vue')
         return
       }

@@ -30,21 +30,21 @@ q-page(padding)
                     <%_ editFields.forEach((e, index) => { -%>
                         <%_ if(relations && relations[e.field]) { -%>
                           <%_ const rel = relations[e.field] -%>
-                      <%= rel.originModelSnakeCase %>-select(v-model='<%= serviceNameCamelCase %>.<%= rel.dependent_attr %>' label='<%= e.fieldTitle %>'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
+                      <%= rel.originModelSnakeCase %>-select(v-model='<%= serviceNameCamelCase %>.<%= rel.dependent_attr %>' :label="$t('<%= serviceName %>_<%= e.field %>')"<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
                         <%_ } else { 
                             switch (e.fieldType) { 
                                 case 'date': -%>
-                      c-date(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>'<% if(e.required) { %> required<% } %>)
+                      c-date(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' :label="$t('<%= serviceName %>_<%= e.field %>')"<% if(e.required) { %> required<% } %>)
                                 <%_ break
                                 case 'boolean': -%>
-                      q-checkbox(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
+                      q-checkbox(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' :label="$t('<%= serviceName %>_<%= e.field %>')"<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
                         template(v-slot:hint) {{ $t('page_field_hint', { entity: '<%= e.field %>' }) }}
                                 <%_ break
                                 case 'number': -%>
-                      c-input(v-model.number='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' :hint="$t('page_field_hint', { entity: '<%= e.field %>' })" type='number'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
+                      c-input(v-model.number='<%= serviceNameCamelCase %>.<%= e.field %>' :label="$t('<%= serviceName %>_<%= e.field %>')" :hint="$t('page_field_hint', { entity: '<%= e.field %>' })" type='number'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
                                 <%_ break
                                 default: -%>
-                      c-input(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' label='<%= e.fieldTitle %>' :hint="$t('page_field_hint', { entity: '<%= e.field %>' })"<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
+                      c-input(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' :label="$t('<%= serviceName %>_<%= e.field %>')" :hint="$t('page_field_hint', { entity: '<%= e.field %>' })"<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
                           <%_ }
                             }-%>
 
@@ -61,13 +61,13 @@ q-page(padding)
   section(v-if="view === 'view'")
     q-card
       q-card-section
-        .text-h6 {{ $t('general_view') }} <%= title %>
+        .text-h6 {{ $t('general_view') }} {{ $t('<%= serviceName %>') }}
 
         .q-pa-md
           .q-gutter-md.row
             .col
             <%_ listFields.forEach(e => { -%>
-              .text-h6 <%= e.fieldTitle %>
+              .text-h6 $t('<%= serviceName %>_<%= e.field %>')
               <%_ if(relations && relations[e.field]) { -%>
                 <%_ const rel = relations[e.field] -%>
               p {{<%= serviceNameCamelCase %>.<%= e.field %>?.<%= rel.label_attr %>}}
@@ -85,13 +85,13 @@ q-page(padding)
 
       q-card-actions(align="around")
         q-btn(@click="view = 'list'" flat) {{ $t('general_back') }}
-        //q-btn(flat color="positive") Aceptar
+        //q-btn(flat color="positive") $t('general_accept')
 
 </template>
 
 <script>
 import { useQuasar } from 'quasar'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { api } from 'boot/axios'
 import { i18n } from 'boot/i18n.js'
 <%_ var importedComponents = [] -%>
@@ -107,40 +107,6 @@ const $t = i18n.global.t
 
 // for date values ==> field: row => date.formatDate(row.fecha_alta, 'YYYY-MM-DD'),
 // for transitive values ==> field: row => row.tipo_documento?.valor,
-
-const columns = [
-<%_ listFields.forEach(e => { -%>
-  <%_ if(relations && relations[e.field]) { -%>
-    <%_ const rel = relations[e.field] -%>
-  {
-    name: '<%= e.field %>',
-    label: '<%= e.fieldTitle %>',
-    align: 'left',
-    field: row => row.<%= e.field %>?.<%= rel.label_attr %> ? row.<%= e.field %>.<%= rel.label_attr %> : '',
-    sortable: true
-  },
-  <%_ } else { -%>
-  {
-    name: '<%= e.field %>',
-    label: '<%= e.fieldTitle %>',
-    align: 'left',
-    field: '<%= e.field %>',
-<%_ if (e.fieldType) { -%>
-    sortable: true,
-    type: '<%= e.fieldType %>'
-<%_ } else { -%>
-    sortable: true
-<%_ }-%>
-  },
-  <%_ }-%>
-<%_ }) -%>
-  {
-    name: 'action',
-    align: 'center',
-    label: $t('general_actions'),
-    field: 'action'
-  }
-]
 
 const clear<%= serviceNamePascalCase %> = () => {
   return {
@@ -179,6 +145,40 @@ export default {
       rowsNumber: 0
     })
     const <%= serviceNameCamelCase %> = ref(clear<%= serviceNamePascalCase %>())
+
+    const columns = computed(() => [
+    <%_ listFields.forEach(e => { -%>
+      <%_ if(relations && relations[e.field]) { -%>
+        <%_ const rel = relations[e.field] -%>
+      {
+        name: '<%= e.field %>',
+        label: $t('<%= serviceName %>_<%= e.field %>'),
+        align: 'left',
+        field: row => row.<%= e.field %>?.<%= rel.label_attr %> ? row.<%= e.field %>.<%= rel.label_attr %> : '',
+        sortable: true
+      },
+      <%_ } else { -%>
+      {
+        name: '<%= e.field %>',
+        label: $t('<%= serviceName %>_<%= e.field %>'),
+        align: 'left',
+        field: '<%= e.field %>',
+    <%_ if (e.fieldType) { -%>
+        sortable: true,
+        type: '<%= e.fieldType %>'
+    <%_ } else { -%>
+        sortable: true
+    <%_ }-%>
+      },
+      <%_ }-%>
+    <%_ }) -%>
+      {
+        name: 'action',
+        align: 'center',
+        label: $t('general_actions'),
+        field: 'action'
+      }
+    ])
 
     const new<%= serviceNamePascalCase %> = () => {
       <%= serviceNameCamelCase %>.value = clear<%= serviceNamePascalCase %>()
