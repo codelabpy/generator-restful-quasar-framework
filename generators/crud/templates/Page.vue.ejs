@@ -67,7 +67,7 @@ q-page(padding)
           .q-gutter-md.row
             .col
             <%_ listFields.forEach(e => { -%>
-              .text-h6 $t('<%= serviceName %>_<%= e.field %>')
+              .text-h6 {{ $t('<%= serviceName %>_<%= e.field %>') }}
               <%_ if(relations && relations[e.field]) { -%>
                 <%_ const rel = relations[e.field] -%>
               p {{<%= serviceNameCamelCase %>.<%= e.field %>?.<%= rel.label_attr %>}}
@@ -259,10 +259,10 @@ export default {
         let message
         if (view.value === 'new') {
           await api.post('/<%= serviceName %>', <%= serviceNameCamelCase %>.value)
-          message = $t('page_added_correctly_message', { entity: '<%= title %>' })
+          message = $t('page_added_correctly_message', { entity: $t('<%= serviceName %>') })
         } else {
           await api.put(`/<%= serviceName %>/${<%= serviceNameCamelCase %>.value.id}`, <%= serviceNameCamelCase %>.value)
-          message = $t('page_edited_correctly_message', { entity: '<%= title %>' })
+          message = $t('page_edited_correctly_message', { entity: $t('<%= serviceName %>') })
         }
         $q.notify({ type: 'positive', message })
         goToList()
@@ -270,7 +270,7 @@ export default {
         console.log(error)
         $q.notify({
           type: 'warning',
-          message: $t('page_save_error_message', { entity: '<%= title %>' })
+          message: $t('page_save_error_message', { entity: $t('<%= serviceName %>') })
         })
       } finally {
         loading.value = false
@@ -280,20 +280,20 @@ export default {
     const onDelete = async () => {
       $q.dialog({
         title: $t('page_delete_dialog_title'),
-        message: $t('page_delete_dialog_message', { entity: '<%= title %>' }),
+        message: $t('page_delete_dialog_message', { entity: $t('<%= serviceName %>') }),
         cancel: true,
         persistent: true
       }).onOk(async _ => {
         loading.value = true
         try {
           await api.delete(`/<%= serviceName %>/${<%= serviceNameCamelCase %>.value.id}`)
-          $q.notify({ type: 'positive', message: $t('page_delete_notify_message', { entity: '<%= title %>' }) })
+          $q.notify({ type: 'positive', message: $t('page_delete_notify_message', { entity: $t('<%= serviceName %>') }) })
           goToList()
         } catch (error) {
           console.log(error)
           $q.notify({
             type: 'warning',
-            message: $t('page_delete_notify_error_message', { entity: '<%= title %>' })
+            message: $t('page_delete_notify_error_message', { entity: $t('<%= serviceName %>') })
           })
         } finally {
           loading.value = false
