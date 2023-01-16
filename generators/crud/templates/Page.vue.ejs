@@ -38,13 +38,13 @@ q-page(padding)
                                 <%_ break
                                 case 'boolean': -%>
                       q-checkbox(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' :label="$t('<%= serviceName %>_<%= e.field %>')"<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
-                        template(v-slot:hint) {{ $t('page_field_hint', { entity: '<%= e.field %>' }) }}
+                        template(v-slot:hint) {{ $t('page_field_hint', { entity: $t('<%= serviceName %>_<%= e.field %>') }) }}
                                 <%_ break
                                 case 'number': -%>
-                      c-input(v-model.number='<%= serviceNameCamelCase %>.<%= e.field %>' :label="$t('<%= serviceName %>_<%= e.field %>')" :hint="$t('page_field_hint', { entity: '<%= e.field %>' })" type='number'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
+                      c-input(v-model.number='<%= serviceNameCamelCase %>.<%= e.field %>' :label="$t('<%= serviceName %>_<%= e.field %>')" :hint="$t('page_field_hint', { entity: $t('<%= serviceName %>_<%= e.field %>') })" type='number'<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
                                 <%_ break
                                 default: -%>
-                      c-input(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' :label="$t('<%= serviceName %>_<%= e.field %>')" :hint="$t('page_field_hint', { entity: '<%= e.field %>' })"<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
+                      c-input(v-model='<%= serviceNameCamelCase %>.<%= e.field %>' :label="$t('<%= serviceName %>_<%= e.field %>')" :hint="$t('page_field_hint', { entity: $t('<%= serviceName %>_<%= e.field %>') })"<% if(e.required) { %> required<% } %><% if(index === 0) { %> autofocus<% } %>)
                           <%_ }
                             }-%>
 
@@ -90,7 +90,7 @@ q-page(padding)
 </template>
 
 <script>
-import { useQuasar } from 'quasar'
+import { useQuasar<% if(listFields.filter(e => e.fieldType === 'date').length > 0) {%>, date<% } %> } from 'quasar'
 import { onMounted, ref, computed } from 'vue'
 import { api } from 'boot/axios'
 import { i18n } from 'boot/i18n.js'
@@ -104,9 +104,6 @@ import <%= rel.originModelPascalCase %>Select from '../components/<%= rel.origin
 <%_ } -%>
 
 const $t = i18n.global.t
-
-// for date values ==> field: row => date.formatDate(row.fecha_alta, 'YYYY-MM-DD'),
-// for transitive values ==> field: row => row.tipo_documento?.valor,
 
 const clear<%= serviceNamePascalCase %> = () => {
   return {
@@ -146,6 +143,9 @@ export default {
     })
     const <%= serviceNameCamelCase %> = ref(clear<%= serviceNamePascalCase %>())
 
+    // for date values ==> field: row => date.formatDate(row.fecha_alta, 'YYYY-MM-DD'),
+    // for transitive values ==> field: row => row.tipo_documento?.valor,
+
     const columns = computed(() => [
     <%_ listFields.forEach(e => { -%>
       <%_ if(relations && relations[e.field]) { -%>
@@ -162,13 +162,14 @@ export default {
         name: '<%= e.field %>',
         label: $t('<%= serviceName %>_<%= e.field %>'),
         align: 'left',
+    <%_ if (e.fieldType === 'date') { -%>
+        field: row => row.<%= e.field %> ? date.formatDate(row.date, 'YYYY-MM-DD') : '',
+        type: '<%= e.fieldType %>',
+    <%_ } else if (e.fieldType) { -%>
         field: '<%= e.field %>',
-    <%_ if (e.fieldType) { -%>
-        sortable: true,
-        type: '<%= e.fieldType %>'
-    <%_ } else { -%>
+        type: '<%= e.fieldType %>',
+    <%_ } -%>
         sortable: true
-    <%_ }-%>
       },
       <%_ }-%>
     <%_ }) -%>
@@ -257,6 +258,9 @@ export default {
       loading.value = true
       try {
         let message
+    <%_ for (let e of fields.filter(e => e.fieldType && e.fieldType === 'date')) { -%>
+        <%= serviceNameCamelCase %>.value.<%= e.field %> = date.formatDate(<%= serviceNameCamelCase %>.value.<%= e.field %>, 'YYYY-MM-DDTHH:MM:S')
+    <%_ } -%>
         if (view.value === 'new') {
           await api.post('/<%= serviceName %>', <%= serviceNameCamelCase %>.value)
           message = $t('page_added_correctly_message', { entity: $t('<%= serviceName %>') })
