@@ -28,7 +28,7 @@ module.exports = configure(function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli/boot-files
     boot: [
-
+      'i18n',
       'axios',
       'navigation-guard'
     ],
@@ -192,7 +192,7 @@ module.exports = configure(function (/* ctx */) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: '<%=projectNameParamCase%>'
+        appId: 'aravo'
       }
     },
 

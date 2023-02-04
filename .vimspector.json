@@ -9,7 +9,7 @@
         "console": "integratedTerminal",
         "program": "~/APPS/DESARROLLO/NODE/node-v16.18.0-linux-x64/bin/yo",
         "args": "restful-quasar-framework",
-        "cwd": "~/PROJECTS/CODELAB/CCAN/ARASY/arasy-frontend"
+        "cwd": "/home/neowinx/PROJECTS/FPUNA/ARAVO/aravo-frontend"
       }
     },
     "crud": {
@@ -21,7 +21,7 @@
         "console": "integratedTerminal",
         "program": "~/APPS/DESARROLLO/NODE/node-v16.18.0-linux-x64/bin/yo",
         "args": "restful-quasar-framework:crud",
-        "cwd": "~/PROJECTS/CODELAB/CCAN/ARASY/arasy-frontend"
+        "cwd": "/home/neowinx/PROJECTS/FPUNA/ARAVO/aravo-frontend"
       }
     }
   }

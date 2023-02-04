@@ -1,8 +1,9 @@
 <template lang="pug">
 q-page.flex.flex-center.q-pa-md
   section
-    h3.text-h3.text-weight-medium.text-blue-grey-10 Página de Inicio
-    p.text-body1.text-center Detalles
+    h1 {{ $t('project_name') }}
+    h3 {{ $t('project_description') }}
+    p.text-body1.text-center Copyrights © 20XX
 
 </template>
 

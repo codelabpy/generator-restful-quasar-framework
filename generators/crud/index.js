@@ -28,7 +28,7 @@ module.exports = class extends Generator {
         name: 'path',
         message:
           'Ingrese el path del servicio RESTful a construir las vistas crud',
-        default: '/hospital'
+        default: '/usuario'
       },
       {
         type: 'confirm',
@@ -224,7 +224,7 @@ module.exports = class extends Generator {
         return
       }
 
-      var pattern = `          route: '/'\n        }`
+      var pattern = `        route: '/'\n      }`
       var menuLinksIndex = mainLayoutJs.indexOf(pattern)
       let hasMoreLinks = mainLayoutJs.indexOf(`${pattern},`) !== -1
 
@@ -237,7 +237,7 @@ module.exports = class extends Generator {
       let jsonMenuLink = this.fs.read(this.templatePath("json_menu_link.ejs"));
 
       return ejs.render(
-        before + `,${jsonMenuLink.slice(0, -1)}${hasMoreLinks ? ',' : ''}` + after,
+        before + `,${jsonMenuLink.slice(0, -1)}${hasMoreLinks ? ',' : '\n'}` + after,
         templateData
       )
     })
@@ -287,11 +287,11 @@ module.exports = class extends Generator {
       )
     })
 
-    modifyDestFile('src/i18n/en-US/index.js', (langIndexJS) => {
+    const processLang = (langIndexJS, generalMessagesLang) => {
       let endIndex = langIndexJS.indexOf('\n}')
       let general_messages = ''
       if (!langIndexJS.includes('general_complete_the_data')) {
-        general_messages = this.fs.read(this.templatePath("general_messages.ejs"));
+        general_messages = this.fs.read(this.templatePath(generalMessagesLang));
       }
       let messages = ''
       if (!langIndexJS.includes(`${templateData.serviceName}_`)) {
@@ -307,8 +307,10 @@ module.exports = class extends Generator {
         before + ',\n' + general_messages + messages,
         templateData
       )
-    })
+    }
 
+    modifyDestFile('src/i18n/en-US/index.js', langIndexJS => processLang(langIndexJS, "general_messages.ejs"))
+    modifyDestFile('src/i18n/es/index.js', langIndexJS => processLang(langIndexJS, "general_messages_es.ejs"))
   }
 
 }
