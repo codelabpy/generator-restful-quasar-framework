@@ -37,6 +37,8 @@ module.exports = class extends Generator {
     ctpl('package.json')
     ctpl('README.md')
     ctpl('index.html')
+    ctpl('src/i18n/en-US/index.js')
+    ctpl('src/i18n/es/index.js')
     ctpl('quasar.config.js')
     ctpl('src/pages/LoginPage.vue')
     ctpl('src/layouts/MainLayout.vue')
