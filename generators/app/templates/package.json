@@ -1,8 +1,8 @@
 {
-  "name": "aravo",
+  "name": "<%=projectNameParamCase%>",
   "version": "0.0.1",
-  "description": "Aravo",
-  "productName": "Aravo",
+  "description": "<%=projectNameTitleCase%>",
+  "productName": "<%=projectNameTitleCase%>",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",

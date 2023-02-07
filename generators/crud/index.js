@@ -198,6 +198,7 @@ module.exports = class extends Generator {
     }
 
     this.fs.copy(`${this.templatePath()}/src`, `${this.destinationPath()}/src`)
+    this.fs.copy(`${this.templatePath()}/generator`, `${this.destinationPath()}/generator`)
 
     this.fs.copyTpl(
       this.templatePath('Page.vue.ejs'),

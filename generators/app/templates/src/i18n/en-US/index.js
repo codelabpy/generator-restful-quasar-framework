@@ -1,5 +1,5 @@
 export default {
-  project_name: 'Aravo',
+  project_name: '<%=projectNameTitleCase%>',
   project_description: 'A super project',
   general_menu: 'Menu',
   general_start: 'Home',

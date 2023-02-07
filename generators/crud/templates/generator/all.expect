@@ -1,0 +1,56 @@
+#!/bin/expect
+
+# log_user 0
+
+# read the input parameters
+# set entity [lindex $argv 0]
+
+set entities {
+  type_treatment 
+  medication_order 
+  medication 
+  medical_visit 
+  doctor 
+  diagnosis_ap 
+  diagnosis 
+  cie_10 
+  chemotherapy 
+  treatment_order 
+  surgery 
+  radiotherapy 
+  puncture 
+  user 
+  role 
+  permission 
+  periodicity 
+  patient 
+  medicine 
+  gender 
+  document_type 
+  hospital 
+  menopausal_state 
+}
+
+foreach idx $entities {
+  spawn yo --no-color restful-quasar-framework:crud
+  expect "Ingrese la url BASE del servicio RESTful a construir las vistas crud (http://localhost:5000)"
+  send "\r"
+  expect "Ingrese el path del servicio RESTful a construir las vistas crud (/hospital)"
+  send "/$idx\r"
+  expect "¿El servicio devuelve items paginados? (Y/n)"
+  send "\r"
+  expect "Ingrese el nombre del atributo json que contiene los items (items) "
+  send "\r"
+  expect "El servicio requiere cabecera de autencicación (JWT, Basic, etc.) (Y/n) "
+  send "\r"
+  expect "Ingrese la cabecera de autorización del servicio (Bearer "
+  send "\r"
+  expect "Ingrese el nombre del servicio (basado en el mismo se generaran los nombres de las vistas) ($idx) "
+  send "\r"
+  expect "Ingrese la ubicación del archivo de configuración opcional (ej. generator/user.meta.json) (generator/$idx.meta.json) "
+  send "\r"
+  expect { 
+    "(ynarxdeiH)" { send "a\r" }
+    eof { }
+  }
+}
